@@ -9,7 +9,7 @@ La documentación interactiva se genera con springdoc-openapi en `/swagger-ui.ht
 | Tema | Convención |
 |---|---|
 | Nombres | Recursos en plural y en español: `/solicitudes`, `/reservas` |
-| Paginación | `?page=0&size=20&sort=fechaRegistro,desc`; la respuesta trae `content`, `totalElements`, `totalPages` |
+| Paginación | `?page=0&size=20&sort=fechaRegistro,desc`; la respuesta es `{ "content": [...], "page": { "size", "number", "totalElements", "totalPages" } }` |
 | Fechas | ISO 8601: `2026-10-24`, `10:00`, `2026-10-17T09:30:00` |
 | JSON | Propiedades en camelCase: `fechaRegistro`, `tipoSolicitudId` |
 | Errores | `ProblemDetail` (RFC 7807) |
@@ -114,6 +114,8 @@ Roles: `SOL` Solicitante · `TEC` Técnico · `PA` Personal de área · `SUP` Su
 | GET | `/api/dashboard?desde=&hasta=` | SUP, ADM | Indicadores del período | HU-11 |
 
 ### Administración
+
+> **Implementado en el S1** (adelantado de la HU-12 para tener usuarios de todos los roles en la demo del MVP): `POST /api/admin/usuarios` (`{ nombre, correo, password, rol, areaId }`, aplica RN-10) y `GET /api/admin/usuarios` (paginado). El resto se implementa en el S7.
 
 Todos con rol `ADM`. CRUD estándar (`GET` lista, `GET /{id}`, `POST`, `PUT /{id}`) más `PUT /{id}/activo` para activar o desactivar. No hay `DELETE` sobre catálogos.
 
