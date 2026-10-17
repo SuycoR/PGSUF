@@ -9,16 +9,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import pe.edu.unmsm.servicios.auth.jwt.JwtAuthenticationFilter;
 import pe.edu.unmsm.servicios.common.ProblemDetailAuthHandlers;
 
 import java.util.List;
 
 /**
- * Stateless security: no server session, JWT on every request (the JWT filter is added in sprint S1).
+ * Stateless security: no server session, JWT on every request.
  * CSRF is disabled because the API does not use cookies for authentication.
  */
 @Configuration
@@ -26,7 +28,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/api/auth/**",
+            "/api/auth/login",
+            "/api/auth/registro",
             "/actuator/health",
             "/swagger-ui.html",
             "/swagger-ui/**",
@@ -34,8 +37,10 @@ public class SecurityConfig {
     };
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, ProblemDetailAuthHandlers authHandlers) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, ProblemDetailAuthHandlers authHandlers,
+            JwtAuthenticationFilter jwtFilter) throws Exception {
         return http
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> {
                 })
