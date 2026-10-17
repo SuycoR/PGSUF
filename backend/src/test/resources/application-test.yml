@@ -9,6 +9,8 @@ app:
     # Test-only key (not used anywhere else).
     secret: dGVzdC1vbmx5LXNlY3JldC1rZXktZm9yLWludGVncmF0aW9uLXRlc3RzLTEyMzQ1Njc4OTA=
     expiration-minutes: 60
+  # Evidence files written by tests stay inside the build folder.
+  upload-dir: target/test-uploads
   admin:
     # Disabled in tests: each test creates the users it needs.
     email: ""

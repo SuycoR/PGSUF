@@ -60,7 +60,7 @@ Roles: `SOL` Solicitante · `TEC` Técnico · `PA` Personal de área · `SUP` Su
 
 | Método | Ruta | Rol | Descripción | HU |
 |---|---|---|---|---|
-| POST | `/api/solicitudes` | * | Registra una solicitud (multipart: parte `datos` en JSON + parte `archivos`, 0..n) | HU-04, HU-15 |
+| POST | `/api/solicitudes` | * | Registra una solicitud (multipart: parte `datos` en JSON + parte `archivos`, de 0 a 5). Errores: 422 `TIPO_INVALIDO`, `PRIORIDAD_INVALIDA`, `ADJUNTO_OBLIGATORIO`, `ARCHIVO_INVALIDO`, `DEMASIADOS_ARCHIVOS` | HU-04, HU-15 |
 | GET | `/api/solicitudes/mis-solicitudes` | * | Solicitudes propias, paginadas | HU-05 |
 | GET | `/api/solicitudes` | SUP, PA, ADM | Bandeja con filtros `estadoId`, `categoriaId`, `prioridadId`, `vencidas`; PA ve solo su área | HU-07 |
 | GET | `/api/solicitudes/asignadas` | TEC | Solicitudes donde es responsable | HU-09 |

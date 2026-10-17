@@ -1,6 +1,7 @@
 package pe.edu.unmsm.servicios.usuario.entity;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,7 +56,7 @@ public class Usuario {
         this.passwordHash = passwordHash;
         this.rol = rol;
         this.area = area;
-        this.fechaCreacion = LocalDateTime.now();
+        this.fechaCreacion = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public Long getId() {

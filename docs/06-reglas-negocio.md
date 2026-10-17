@@ -40,6 +40,9 @@ Cada regla tiene un número fijo (RN-xx) para citarla en historias, código y pr
 
 `fecha_limite = fecha_registro + tipo_solicitud.sla_horas`. Se calcula al registrar y **no se recalcula** si después el administrador cambia el SLA del tipo.
 
+- Las horas son **corridas**: no se descuentan fines de semana ni feriados (calcular días hábiles requeriría un calendario de feriados).
+- Las fechas se guardan en segundos enteros (la columna es `DATETIME`), así que se truncan antes de guardar y de responder.
+
 ## RN-03 — Solicitud vencida
 
 Una solicitud está vencida si `fecha_limite < ahora` **y** su estado no es final (`estado.es_final = false`). No se guarda como estado: se calcula en las consultas.
@@ -115,7 +118,8 @@ Una solicitud solo puede tener estados de ámbito `SOLICITUD` o `AMBOS`; una res
 
 ## RN-12 — Archivos adjuntos
 
-- Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 5 MB por archivo.
+- Formatos permitidos: PDF, JPG, PNG. Tamaño máximo: 5 MB por archivo. Hasta 5 archivos por envío.
+- Todos los archivos se validan **antes** de escribir nada; si la transacción falla después de escribirlos, se borran del disco.
 - El tipo se valida **por el contenido del archivo** (sus primeros bytes), no solo por la extensión o el `Content-Type` que envía el navegador (OWASP: subida de archivos).
 - En disco se guarda con un nombre generado (UUID), nunca con el nombre original.
 - Si `tipo_solicitud.requiere_adjunto = true`, la solicitud no se registra sin al menos un archivo válido.
