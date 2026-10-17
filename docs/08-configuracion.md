@@ -118,6 +118,17 @@ No se siembra ningún usuario en las migraciones. Al arrancar, un `CommandLineRu
 - Si no existe y `ADMIN_EMAIL` y `ADMIN_PASSWORD` están definidas → lo crea con la contraseña cifrada con BCrypt.
 - Si ya existe → no hace nada.
 - Nunca escribe la contraseña en el log.
+- En el perfil `prod` se niega a arrancar si `ADMIN_PASSWORD` tiene menos de 12 caracteres. En desarrollo se permite una contraseña simple.
+
+## Pruebas de integración
+
+Las pruebas de integración (`@IntegrationTest`) usan una base aparte, `servicios_universitarios_test`, en el mismo MySQL local, con el perfil `test` (`src/test/resources/application-test.yml`). Cada prueba corre en una transacción que se deshace al terminar, así que no deja datos. Crearla una sola vez:
+
+```sql
+CREATE DATABASE servicios_universitarios_test CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+```
+
+> En el CI (sprint S8) esta base se reemplaza por un servicio MySQL del pipeline.
 
 ## Levantar el proyecto
 

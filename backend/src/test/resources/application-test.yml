@@ -1,0 +1,19 @@
+# Integration tests run against a separate database so the development data is never touched.
+# DB_USER / DB_PASSWORD come from the git-ignored backend/.env, as in development.
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/servicios_universitarios_test?serverTimezone=America/Lima
+
+app:
+  jwt:
+    # Test-only key (not used anywhere else).
+    secret: dGVzdC1vbmx5LXNlY3JldC1rZXktZm9yLWludGVncmF0aW9uLXRlc3RzLTEyMzQ1Njc4OTA=
+    expiration-minutes: 60
+  admin:
+    # Disabled in tests: each test creates the users it needs.
+    email: ""
+    password: ""
+
+logging:
+  level:
+    pe.edu.unmsm.servicios: INFO
