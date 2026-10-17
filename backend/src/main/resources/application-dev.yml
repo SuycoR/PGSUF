@@ -1,0 +1,3 @@
+logging:
+  level:
+    pe.edu.unmsm.servicios: DEBUG

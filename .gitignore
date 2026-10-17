@@ -1,0 +1,30 @@
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Uploaded evidence files
+uploads/
+
+# Academic deliverables (kept outside the repository)
+*.docx
+*.pdf
+~$*
+
+# Java / Maven
+backend/target/
+*.class
+*.log
+hs_err_pid*
+
+# Node / Vite
+node_modules/
+frontend/app/dist/
+frontend/app/.vite/
+
+# IDEs and OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

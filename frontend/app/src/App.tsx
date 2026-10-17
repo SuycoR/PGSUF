@@ -1,0 +1,14 @@
+import { BrowserRouter } from 'react-router';
+
+import { AuthProvider } from './auth/AuthContext';
+import { AppRoutes } from './routes/AppRoutes';
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
