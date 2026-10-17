@@ -5,6 +5,7 @@ import { useAuth } from '../auth/useAuth';
 import { AppLayout } from '../components/layout/AppLayout';
 import { EnConstruccion } from '../pages/EnConstruccion';
 import { LoginPage } from '../pages/LoginPage';
+import { RegistroPage } from '../pages/RegistroPage';
 import { NoEncontradaPage, SinPermisoPage } from '../pages/SinPermisoPage';
 import { inicioPara, rolesDe } from './menu';
 import { RequireAuth } from './RequireAuth';
@@ -22,6 +23,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/registro" element={<RegistroPage />} />
       <Route path="/" element={<Inicio />} />
 
       <Route

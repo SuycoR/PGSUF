@@ -19,3 +19,8 @@
 .login-boton {
   width: 100%;
 }
+
+.login-pie {
+  margin: 1.25rem 0 0;
+  text-align: center;
+}

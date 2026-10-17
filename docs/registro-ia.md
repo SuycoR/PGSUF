@@ -61,3 +61,16 @@ Copiar este bloque para cada registro nuevo:
 | Validación realizada | [Completar] |
 | Modificaciones | [Completar] |
 | Responsable | Suyco Rivera Pedro Jesus |
+
+### IA-04 — Construcción de los sprints S0 y S1
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-10-17 |
+| Herramienta | Claude (Claude Code) |
+| Prompt | Construir la base del proyecto (S0) y la autenticación (S1) según la documentación de `docs/`, con supuestos confirmados por el equipo antes de generar. |
+| Resultado generado | Backend Spring Boot (seguridad JWT, migraciones Flyway, registro, login, creación de usuarios por el administrador) y frontend React + TypeScript (layout, rutas por rol, login y registro), con pruebas automatizadas. |
+| ¿Se utilizó? | [Completar tras la revisión del equipo] |
+| Validación realizada | 37 pruebas de backend y 18 de frontend; pruebas manuales de la API (casos válidos, errores 400/401/403/409/422, tokens alterados y falsificados) y del flujo completo en el navegador. |
+| Modificaciones | [Completar] |
+| Responsable | Suyco Rivera Pedro Jesus |

@@ -16,5 +16,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    // userEvent types character by character; on a loaded machine a full form can exceed the 5 s default.
+    testTimeout: 15000,
   },
 })

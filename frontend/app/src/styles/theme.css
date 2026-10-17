@@ -112,6 +112,19 @@ a {
   font-size: 0.875rem;
 }
 
+.campo-ayuda {
+  color: var(--color-texto-suave);
+  font-size: 0.875rem;
+}
+
+.alerta-exito {
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--color-exito);
+  background: #e8f5ee;
+  border-radius: var(--radio);
+  margin-bottom: 1rem;
+}
+
 .alerta-error {
   padding: 0.75rem 1rem;
   border-left: 4px solid var(--color-error);

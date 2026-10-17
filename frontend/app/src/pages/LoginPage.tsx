@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useNavigate } from 'react-router';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 
 import { ApiError, apiFetch } from '../api/client';
 import type { Sesion } from '../auth/types';
@@ -11,6 +11,8 @@ import { validarLogin, type ErroresLogin } from './validarLogin';
 export function LoginPage() {
   const { usuario, iniciarSesion } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const mensajeExito = (location.state as { mensaje?: string } | null)?.mensaje;
   const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [errores, setErrores] = useState<ErroresLogin>({});
@@ -51,6 +53,12 @@ export function LoginPage() {
       <form className="tarjeta login-tarjeta" onSubmit={onSubmit} noValidate>
         <h1>Iniciar sesión</h1>
         <p className="login-subtitulo">Servicios Universitarios</p>
+
+        {mensajeExito && !errorServidor && (
+          <div className="alerta-exito" role="status">
+            {mensajeExito}
+          </div>
+        )}
 
         {errorServidor && (
           <div className="alerta-error" role="alert">
@@ -97,6 +105,10 @@ export function LoginPage() {
         <button type="submit" className="btn btn-primario login-boton" disabled={enviando}>
           {enviando ? 'Ingresando…' : 'Ingresar'}
         </button>
+
+        <p className="login-pie">
+          ¿No tiene cuenta? <Link to="/registro">Regístrese</Link>
+        </p>
       </form>
     </div>
   );

@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthProvider } from '../auth/AuthContext';
+import { AppRoutes } from '../routes/AppRoutes';
 import { LoginPage } from './LoginPage';
 import { validarLogin } from './validarLogin';
 
@@ -45,6 +46,30 @@ describe('LoginPage', () => {
     expect(screen.getByText('Ingrese su correo.')).toBeInTheDocument();
     expect(screen.getByText('Ingrese su contraseña.')).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('HU-01 scenario 1: stores the session and opens the landing page of the role', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(
+      JSON.stringify({
+        token: 'jwt',
+        usuario: { id: 3, nombre: 'Supervisor Uno', correo: 'sup1@unmsm.edu.pe', rol: 'SUPERVISOR', areaId: null },
+      }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
+    )));
+    render(
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/login']}>
+          <AppRoutes />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    await userEvent.type(screen.getByLabelText('Correo institucional'), 'sup1@unmsm.edu.pe');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'Supervisor1');
+    await userEvent.click(screen.getByRole('button', { name: 'Ingresar' }));
+
+    expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(JSON.parse(sessionStorage.getItem('servicios.sesion') ?? '{}').token).toBe('jwt');
   });
 
   it('HU-01 scenario 2: shows the server message for wrong credentials', async () => {
