@@ -34,6 +34,20 @@ export class ApiError extends Error {
 const BASE_URL = '/api';
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await enviar(path, init);
+  if (response.status === 204) {
+    return undefined as T;
+  }
+  return (await response.json()) as T;
+}
+
+/** Downloads a protected file: a plain link cannot send the Authorization header. */
+export async function apiDescargar(path: string): Promise<Blob> {
+  const response = await enviar(path, {});
+  return response.blob();
+}
+
+async function enviar(path: string, init: RequestInit): Promise<Response> {
   const headers = new Headers(init.headers);
   const token = leerToken();
   if (token) {
@@ -58,11 +72,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   if (!response.ok) {
     throw await toApiError(response);
   }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-  return (await response.json()) as T;
+  return response;
 }
 
 async function toApiError(response: Response): Promise<ApiError> {

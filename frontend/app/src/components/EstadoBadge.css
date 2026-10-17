@@ -1,0 +1,41 @@
+.estado-badge {
+  display: inline-block;
+  padding: 0.15rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.estado-pendiente {
+  background: #edf0f4;
+  color: #3d4757;
+}
+
+.estado-en-curso {
+  background: var(--color-fondo);
+  border-color: var(--color-primario);
+  color: var(--color-primario);
+}
+
+.estado-resuelta {
+  background: #e8f5ee;
+  color: var(--color-exito);
+}
+
+.estado-rechazada {
+  background: #fdecea;
+  color: var(--color-error);
+}
+
+.etiqueta-vencida {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #fdecea;
+  color: var(--color-error);
+}

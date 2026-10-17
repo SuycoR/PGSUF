@@ -8,6 +8,7 @@ Orden de implementación alineado con las fases de la guía del curso. Cada spri
 |---|---|---|
 | S0 | Completado | 2026-10-17 |
 | S1 | Completado (incluye `POST/GET /api/admin/usuarios`, adelantado de la HU-12) | 2026-10-17 |
+| S2 | Completado (incluye la derivación automática de trámites, RN-09, adelantada del S4) | 2026-10-17 |
 
 ## Hitos de la guía
 

@@ -1,0 +1,185 @@
+.encabezado-pagina {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.encabezado-pagina h1 {
+  margin: 0;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
+.btn-pequeno {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* Form */
+.formulario-solicitud {
+  margin-top: 1rem;
+}
+
+.fila-dos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.25rem;
+}
+
+.nota-tipo {
+  margin: -0.25rem 0 1rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--color-fondo-alt);
+  border-left: 3px solid var(--color-acento);
+  border-radius: var(--radio);
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.lista-archivos {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.lista-archivos li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-borde);
+  overflow-wrap: anywhere;
+}
+
+/* List */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filtros .campo {
+  min-width: 200px;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+/* The request code must stay on one line (SOL-2026-0001). */
+.tabla td:first-child {
+  white-space: nowrap;
+}
+
+.tabla th {
+  background: var(--color-fondo-alt);
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+.tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.vacio {
+  color: var(--color-texto-suave);
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Detail */
+.detalle {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.detalle h2 {
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+}
+
+.datos dt {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.datos dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.texto-largo {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.historial {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.historial li {
+  padding: 0.6rem 0 0.6rem 1rem;
+  border-left: 3px solid var(--color-acento);
+  margin-bottom: 0.5rem;
+}
+
+.historial-meta {
+  margin-left: 0.6rem;
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+}
+
+.historial-observacion {
+  margin: 0.35rem 0 0;
+}
+
+@media (max-width: 768px) {
+  .fila-dos {
+    grid-template-columns: 1fr;
+  }
+
+  .filtros .campo {
+    flex: 1 1 100%;
+  }
+}

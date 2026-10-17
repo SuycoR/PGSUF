@@ -62,6 +62,19 @@ Copiar este bloque para cada registro nuevo:
 | Modificaciones | [Completar] |
 | Responsable | Suyco Rivera Pedro Jesus |
 
+### IA-05 — Construcción del sprint S2
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-10-17 |
+| Herramienta | Claude (Claude Code) |
+| Prompt | Construir el registro y la consulta de solicitudes (HU-04, HU-05, HU-06) con evidencias, códigos únicos, fecha límite, historial y derivación automática de trámites, según supuestos confirmados por el equipo. |
+| Resultado generado | Endpoints de solicitudes, evidencias y catálogos; validación de archivos por contenido; pantallas de nueva solicitud, listado y detalle; pruebas unitarias, de integración y de concurrencia. |
+| ¿Se utilizó? | [Completar tras la revisión del equipo] |
+| Validación realizada | 68 pruebas de backend y 28 de frontend; pruebas manuales con archivos reales (PDF válido, ejecutable renombrado), visibilidad por rol y recorrido completo en el navegador. Se detectó y corrigió un desfase de fracciones de segundo entre la respuesta y la base de datos. |
+| Modificaciones | [Completar] |
+| Responsable | Suyco Rivera Pedro Jesus |
+
 ### IA-04 — Construcción de los sprints S0 y S1
 
 | Campo | Registro |

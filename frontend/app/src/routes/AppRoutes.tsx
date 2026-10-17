@@ -6,6 +6,9 @@ import { AppLayout } from '../components/layout/AppLayout';
 import { EnConstruccion } from '../pages/EnConstruccion';
 import { LoginPage } from '../pages/LoginPage';
 import { RegistroPage } from '../pages/RegistroPage';
+import { MisSolicitudesPage } from '../pages/solicitudes/MisSolicitudesPage';
+import { NuevaSolicitudPage } from '../pages/solicitudes/NuevaSolicitudPage';
+import { SolicitudDetallePage } from '../pages/solicitudes/SolicitudDetallePage';
 import { NoEncontradaPage, SinPermisoPage } from '../pages/SinPermisoPage';
 import { inicioPara, rolesDe } from './menu';
 import { RequireAuth } from './RequireAuth';
@@ -33,14 +36,10 @@ export function AppRoutes() {
           </RequireAuth>
         }
       >
-        <Route
-          path="/solicitudes"
-          element={protegida('/solicitudes', <EnConstruccion titulo="Mis solicitudes" historia="HU-05" sprint="S2" />)}
-        />
-        <Route
-          path="/solicitudes/nueva"
-          element={protegida('/solicitudes/nueva', <EnConstruccion titulo="Nueva solicitud" historia="HU-04, HU-15" sprint="S2" />)}
-        />
+        <Route path="/solicitudes" element={protegida('/solicitudes', <MisSolicitudesPage />)} />
+        <Route path="/solicitudes/nueva" element={protegida('/solicitudes/nueva', <NuevaSolicitudPage />)} />
+        {/* Any authenticated user may open a detail page; the backend decides visibility (RN-20). */}
+        <Route path="/solicitudes/:id" element={<SolicitudDetallePage />} />
         <Route
           path="/reservas"
           element={protegida('/reservas', <EnConstruccion titulo="Mis reservas" historia="HU-13" sprint="S5" />)}
