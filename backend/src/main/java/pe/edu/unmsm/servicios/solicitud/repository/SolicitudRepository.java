@@ -65,4 +65,15 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
             "prioridad", "usuario", "responsable"})
     @Query("SELECT s FROM Solicitud s WHERE s.id = :id")
     Optional<Solicitud> buscarDetalle(@Param("id") Long id);
+
+    /** HU-11: loads requests within a date range for metrics and dashboard calculations. */
+    @EntityGraph(attributePaths = {"tipoSolicitud", "tipoSolicitud.categoria", "estado", "prioridad", "responsable"})
+    @Query("""
+            SELECT s FROM Solicitud s
+            WHERE (:desde IS NULL OR s.fechaRegistro >= :desde)
+              AND (:hasta IS NULL OR s.fechaRegistro <= :hasta)
+            """)
+    java.util.List<Solicitud> buscarParaDashboard(
+            @Param("desde") LocalDateTime desde,
+            @Param("hasta") LocalDateTime hasta);
 }

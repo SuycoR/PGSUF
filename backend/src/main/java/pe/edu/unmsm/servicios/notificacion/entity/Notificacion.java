@@ -76,6 +76,11 @@ public class Notificacion {
         return new Notificacion(usuario, tipo, titulo, mensaje, solicitudId, null, fechaCreacion);
     }
 
+    public static Notificacion paraReserva(Usuario usuario, TipoNotificacion tipo, String titulo, String mensaje,
+            Long reservaId, LocalDateTime fechaCreacion) {
+        return new Notificacion(usuario, tipo, titulo, mensaje, null, reservaId, fechaCreacion);
+    }
+
     public void marcarLeida(LocalDateTime cuando) {
         if (!this.leida) {
             this.leida = true;

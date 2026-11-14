@@ -54,6 +54,9 @@ public class SolicitudController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Registra una solicitud (parte 'datos' en JSON y parte 'archivos', hasta 5)")
+    @ApiResponse(responseCode = "201", description = "Solicitud registrada con éxito")
+    @ApiResponse(responseCode = "400", description = "Datos de solicitud inválidos")
+    @ApiResponse(responseCode = "422", description = "Regla de negocio no cumplida (tipo inválido, adjunto obligatorio faltante, archivo no permitido)")
     public ResponseEntity<SolicitudCreadaResponse> registrar(
             @AuthenticationPrincipal UsuarioAutenticado usuario,
             @Valid @RequestPart("datos") CrearSolicitudRequest datos,
@@ -64,6 +67,7 @@ public class SolicitudController {
 
     @GetMapping("/mis-solicitudes")
     @Operation(summary = "Solicitudes del usuario autenticado")
+    @ApiResponse(responseCode = "200", description = "Página de solicitudes propias")
     public Page<SolicitudResumen> misSolicitudes(
             @AuthenticationPrincipal UsuarioAutenticado usuario,
             @RequestParam(required = false) Integer estadoId,
@@ -101,12 +105,16 @@ public class SolicitudController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Detalle de una solicitud visible para el usuario")
+    @ApiResponse(responseCode = "200", description = "Detalle de la solicitud")
+    @ApiResponse(responseCode = "404", description = "Solicitud no encontrada o no visible (RN-20)")
     public SolicitudDetalle detalle(@AuthenticationPrincipal UsuarioAutenticado usuario, @PathVariable Long id) {
         return service.detalle(usuario.id(), id);
     }
 
     @GetMapping("/{id}/historial")
     @Operation(summary = "Historial de estados")
+    @ApiResponse(responseCode = "200", description = "Historial cronológico de cambios de estado")
+    @ApiResponse(responseCode = "404", description = "Solicitud no encontrada o no visible")
     public List<HistorialResponse> historial(@AuthenticationPrincipal UsuarioAutenticado usuario,
             @PathVariable Long id) {
         return service.historial(usuario.id(), id);
@@ -161,7 +169,9 @@ public class SolicitudController {
     }
 
     @GetMapping("/{id}/evidencias")
-    @Operation(summary = "Evidencias adjuntas")
+    @Operation(summary = "Evidencias adjuntas de la solicitud")
+    @ApiResponse(responseCode = "200", description = "Lista de archivos de evidencia")
+    @ApiResponse(responseCode = "404", description = "Solicitud no encontrada o no visible")
     public List<EvidenciaResponse> evidencias(@AuthenticationPrincipal UsuarioAutenticado usuario,
             @PathVariable Long id) {
         return service.evidencias(usuario.id(), id);

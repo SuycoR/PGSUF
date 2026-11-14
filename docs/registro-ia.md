@@ -126,3 +126,16 @@ Copiar este bloque para cada registro nuevo:
 | Validación realizada | Suite completa de backend contra MySQL 9 (124 pruebas); lint, build y 36 pruebas de frontend. Se revisó el listener: las notificaciones solo se crean si la transacción confirma. |
 | Modificaciones | Ninguna. Decisión: un usuario sin relación con la solicitud recibe 404 en comentarios (como en detalle, evidencias e historial) para no revelar que existe. |
 | Responsable | [Completar: Persona 1] |
+
+### IA-09 — Persona 2: Reservas de Ambientes (S5), Dashboard de Indicadores (S7) y Documentación Swagger/OpenAPI
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-14 |
+| Herramienta | Antigravity (Gemini 3.8 Flash) |
+| Prompt | Implementar todo el bloque de Persona 2 en `feature/reservas-dashboard`: módulo de Reservas y Ambientes (HU-13, HU-14) con control de concurrencia pesimista (`SELECT FOR UPDATE`), validaciones de horario y cruce (RN-04, RN-17, RN-13), eventos post-commit de notificación (`RESERVA_REGISTRADA`, `RESERVA_RESUELTA`, RN-16); módulo de Dashboard (HU-11, RN-03) con agregaciones por período, KPIs y desgloses; vistas React en `/reservas` (`MisReservasPage`), `/reservas/aprobacion` (`AprobacionReservasPage`) y `/dashboard` (`DashboardPage`); suite de pruebas unitarias y WebMvc de backend y frontend; y auditoría completa de Swagger/OpenAPI al 100% de la API según `docs/07-api.md`. |
+| Resultado generado | Paquetes `ambiente`, `reserva` y `dashboard` en backend; entidades `Ambiente` y `Reserva`; repositorios con queries pesimistas y detección de cruces; servicios y controladores REST; integración de notificaciones en `NotificacionService` y `NotificacionListener`; páginas y CSS en frontend; 22 pruebas de backend (unitarias y MockMvc con `@WebMvcTest`) y 43 pruebas de frontend (`vitest`); y documentación interactiva OpenAPI en todos los endpoints. |
+| ¿Se utilizó? | Sí, verificado y validado al 100%. |
+| Validación realizada | Ejecución exitosa de pruebas unitarias y web de backend (`BUILD SUCCESS`, 22 tests); verificación de tipos TypeScript y empaquetado Vite (`npm run build` sin errores); ejecución de vitest (8 archivos de prueba pasados, 43 tests exitosos). |
+| Modificaciones | Se ajustó el título del `DashboardPage` a `Dashboard` para compatibilidad exacta con los tests de navegación previa y se configuró strictness lenient en mocks de servicios. |
+| Responsable | Persona 2 |

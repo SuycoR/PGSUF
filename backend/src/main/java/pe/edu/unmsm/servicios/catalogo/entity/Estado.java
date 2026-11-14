@@ -18,6 +18,7 @@ public class Estado {
     public static final String RESUELTA = "Resuelta";
     public static final String CERRADA = "Cerrada";
     public static final String RECHAZADA = "Rechazada";
+    public static final String APROBADA = "Aprobada";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

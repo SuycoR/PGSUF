@@ -150,3 +150,110 @@ export interface Notificacion {
 export interface CantidadNoLeidas {
   cantidad: number;
 }
+
+export type TipoAmbiente = 'AUDITORIO' | 'LABORATORIO' | 'SALON';
+export type Pabellon = 'ANTIGUO' | 'NUEVO' | 'CENTRAL';
+
+export interface Ambiente {
+  id: number;
+  nombre: string;
+  tipo: TipoAmbiente;
+  pabellon: Pabellon;
+  piso: number | null;
+  capacidad: number;
+  activo: boolean;
+}
+
+export interface IntervaloHorario {
+  horaInicio: string;
+  horaFin: string;
+  codigo: string;
+}
+
+export interface DisponibilidadResponse {
+  ambienteId: number;
+  ambienteNombre: string;
+  fecha: string;
+  reservasAprobadas: IntervaloHorario[];
+}
+
+export interface CrearReservaRequest {
+  ambienteId: number;
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  motivo: string;
+}
+
+export interface RechazarReservaRequest {
+  motivo: string;
+}
+
+export interface ReservaResponse {
+  id: number;
+  codigo: string;
+  ambiente: {
+    id: number;
+    nombre: string;
+    tipo: TipoAmbiente;
+    pabellon: Pabellon;
+    piso: number | null;
+  };
+  usuario: {
+    id: number;
+    nombre: string;
+    correo: string;
+  };
+  aprobador: {
+    id: number;
+    nombre: string;
+    correo: string;
+  } | null;
+  estado: {
+    id: number;
+    nombre: string;
+  };
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  motivo: string;
+  motivoRechazo: string | null;
+  fechaRegistro: string;
+  fechaResolucion: string | null;
+}
+
+export interface ReservaResumen {
+  id: number;
+  codigo: string;
+  ambienteId: number;
+  ambienteNombre: string;
+  usuarioId: number;
+  usuarioNombre: string;
+  estadoId: number;
+  estadoNombre: string;
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  motivo: string;
+  motivoRechazo: string | null;
+  fechaRegistro: string;
+  fechaResolucion: string | null;
+}
+
+export interface KpiItem {
+  id: number | null;
+  nombre: string;
+  cantidad: number;
+}
+
+export interface DashboardResponse {
+  totalRegistradas: number;
+  totalPendientes: number;
+  totalAtendidas: number;
+  totalVencidas: number;
+  porcentajeResueltas: number;
+  tiempoPromedioAtencionHoras: number;
+  porCategoria: KpiItem[];
+  porPrioridad: KpiItem[];
+  porResponsable: KpiItem[];
+}

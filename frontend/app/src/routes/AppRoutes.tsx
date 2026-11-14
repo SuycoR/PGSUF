@@ -12,6 +12,9 @@ import { NuevaSolicitudPage } from '../pages/solicitudes/NuevaSolicitudPage';
 import { AsignadasPage } from '../pages/solicitudes/AsignadasPage';
 import { BandejaPage } from '../pages/solicitudes/BandejaPage';
 import { SolicitudDetallePage } from '../pages/solicitudes/SolicitudDetallePage';
+import { MisReservasPage } from '../pages/reservas/MisReservasPage';
+import { AprobacionReservasPage } from '../pages/reservas/AprobacionReservasPage';
+import { DashboardPage } from '../pages/dashboard/DashboardPage';
 import { NoEncontradaPage, SinPermisoPage } from '../pages/SinPermisoPage';
 import { inicioPara, rolesDe } from './menu';
 import { RequireAuth } from './RequireAuth';
@@ -45,7 +48,7 @@ export function AppRoutes() {
         <Route path="/solicitudes/:id" element={<SolicitudDetallePage />} />
         <Route
           path="/reservas"
-          element={protegida('/reservas', <EnConstruccion titulo="Mis reservas" historia="HU-13" sprint="S5" />)}
+          element={protegida('/reservas', <MisReservasPage />)}
         />
         <Route
           path="/asignadas"
@@ -57,11 +60,11 @@ export function AppRoutes() {
         />
         <Route
           path="/reservas/aprobacion"
-          element={protegida('/reservas/aprobacion', <EnConstruccion titulo="Aprobación de reservas" historia="HU-14" sprint="S5" />)}
+          element={protegida('/reservas/aprobacion', <AprobacionReservasPage />)}
         />
         <Route
           path="/dashboard"
-          element={protegida('/dashboard', <EnConstruccion titulo="Dashboard" historia="HU-11" sprint="S7" />)}
+          element={protegida('/dashboard', <DashboardPage />)}
         />
         <Route
           path="/admin"
