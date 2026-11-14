@@ -5,6 +5,7 @@ import { useAuth } from '../auth/useAuth';
 import { AppLayout } from '../components/layout/AppLayout';
 import { EnConstruccion } from '../pages/EnConstruccion';
 import { LoginPage } from '../pages/LoginPage';
+import { NotificacionesPage } from '../pages/NotificacionesPage';
 import { RegistroPage } from '../pages/RegistroPage';
 import { MisSolicitudesPage } from '../pages/solicitudes/MisSolicitudesPage';
 import { NuevaSolicitudPage } from '../pages/solicitudes/NuevaSolicitudPage';
@@ -66,10 +67,7 @@ export function AppRoutes() {
           path="/admin"
           element={protegida('/admin', <EnConstruccion titulo="Administración" historia="HU-12" sprint="S7" />)}
         />
-        <Route
-          path="/notificaciones"
-          element={<EnConstruccion titulo="Notificaciones" historia="HU-17" sprint="S6" />}
-        />
+        <Route path="/notificaciones" element={<NotificacionesPage />} />
         <Route path="/sin-permiso" element={<SinPermisoPage />} />
         <Route path="*" element={<NoEncontradaPage />} />
       </Route>

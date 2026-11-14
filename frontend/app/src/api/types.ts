@@ -116,3 +116,37 @@ export interface Evidencia {
   fechaSubida: string;
   subidoPor: string;
 }
+
+export interface Comentario {
+  id: number;
+  autorId: number;
+  autor: string;
+  autorRol: string;
+  texto: string;
+  fecha: string;
+}
+
+export type TipoNotificacion =
+  | 'SOLICITUD_REGISTRADA'
+  | 'SOLICITUD_DERIVADA'
+  | 'SOLICITUD_ASIGNADA'
+  | 'ESTADO_CAMBIADO'
+  | 'COMENTARIO_NUEVO'
+  | 'RESERVA_REGISTRADA'
+  | 'RESERVA_RESUELTA';
+
+export interface Notificacion {
+  id: number;
+  tipo: TipoNotificacion | string;
+  titulo: string;
+  mensaje: string;
+  solicitudId: number | null;
+  reservaId: number | null;
+  leida: boolean;
+  fechaCreacion: string;
+  fechaLectura: string | null;
+}
+
+export interface CantidadNoLeidas {
+  cantidad: number;
+}

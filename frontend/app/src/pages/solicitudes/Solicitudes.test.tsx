@@ -51,6 +51,7 @@ const DETALLE_RUTAS = {
   'GET /api/solicitudes/15/historial': () => json(200, HISTORIAL),
   'GET /api/solicitudes/15/evidencias': () =>
     json(200, [{ id: 7, nombreArchivo: 'sustento.pdf', tipoMime: 'application/pdf', tamanoBytes: 2048, fechaSubida: '2026-10-17T09:30:00', subidoPor: 'Ana' }]),
+  'GET /api/solicitudes/15/comentarios': () => json(200, []),
 };
 
 beforeEach(() => {
@@ -381,5 +382,41 @@ describe('SolicitudDetallePage gestion', () => {
     await userEvent.upload(screen.getByLabelText(/Agregar evidencias/), png);
     await userEvent.click(screen.getByRole('button', { name: 'Subir evidencias' }));
     expect(await screen.findByText(/reparado\.png/)).toBeInTheDocument();
+  });
+
+  it('HU-10: displays chronological comments, validates blank submission, and posts a new comment', async () => {
+    const lista = [
+      { id: 1, autorId: 1, autor: 'Ana', autorRol: 'SOLICITANTE', texto: 'Primer mensaje', fecha: '2026-10-17T09:35:00' },
+    ];
+    const fetchMock = fakeApi({
+      ...DETALLE_RUTAS,
+      'GET /api/solicitudes/15/comentarios': () => json(200, lista),
+      'POST /api/solicitudes/15/comentarios': (init) => {
+        const body = JSON.parse(String(init?.body)) as { texto: string };
+        return json(201, {
+          id: 2,
+          autorId: 1,
+          autor: 'Ana',
+          autorRol: 'SOLICITANTE',
+          texto: body.texto,
+          fecha: '2026-10-17T09:40:00',
+        });
+      },
+    });
+    renderEn('/solicitudes/15');
+
+    expect(await screen.findByText('Primer mensaje')).toBeInTheDocument();
+
+    // Blank submission is blocked client-side without calling POST
+    await userEvent.click(screen.getByRole('button', { name: 'Enviar comentario' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Escriba un comentario antes de enviar.');
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false);
+
+    // Valid comment is posted and appended
+    await userEvent.type(screen.getByLabelText('Agregar comentario'), 'Adjunto el detalle actualizado');
+    await userEvent.click(screen.getByRole('button', { name: 'Enviar comentario' }));
+
+    expect(await screen.findByText('Adjunto el detalle actualizado')).toBeInTheDocument();
+    expect(screen.getByLabelText('Agregar comentario')).toHaveValue('');
   });
 });
