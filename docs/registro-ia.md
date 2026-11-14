@@ -87,3 +87,42 @@ Copiar este bloque para cada registro nuevo:
 | Validación realizada | 37 pruebas de backend y 18 de frontend; pruebas manuales de la API (casos válidos, errores 400/401/403/409/422, tokens alterados y falsificados) y del flujo completo en el navegador. |
 | Modificaciones | [Completar] |
 | Responsable | Suyco Rivera Pedro Jesus |
+
+### IA-06 — Sprint S3: gestión y asignación de solicitudes (HU-07, HU-08, HU-09)
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-13 |
+| Herramienta | T3 Code: Claude (Claude Code) como orquestador y revisor; subagente Gemini 4 Hydrogen (Antigravity) como implementador |
+| Prompt | Implementar en `feature/s3-gestion-solicitudes` la bandeja paginada con filtros (`estadoId`, `categoriaId`, `prioridadId`, `vencidas`), las solicitudes asignadas al técnico, las transiciones permitidas por `estado_transicion` y rol (RN-05), la asignación de técnico (RN-07), el cambio de estado con historial y validación de propiedad/área (RN-06), el cambio de prioridad y la subida/descarga de evidencias; en el frontend, `BandejaPage`, `AsignadasPage` y los controles del detalle; con pruebas unitarias y MockMvc de 401/403 y transiciones válidas/inválidas. |
+| Resultado generado | Entidad `EstadoTransicion`, `TransicionService`, eventos `SolicitudAsignadaEvent`/`EstadoCambiadoEvent`, nuevos endpoints en `SolicitudController` y `UsuarioController`, pantallas de bandeja y asignadas, detalle con transiciones, asignación, prioridad y evidencias, y pruebas de backend y frontend (PR #2). |
+| ¿Se utilizó? | Sí, con correcciones. |
+| Validación realizada | Suite completa de backend contra MySQL 9 en Docker (90 pruebas); lint, build y 32 pruebas de frontend. La revisión detectó que la prueba de solicitudes vencidas dependía de la zona horaria del servidor de base de datos (`NOW()` en UTC frente al `Clock` de la aplicación en America/Lima) y del caché de primer nivel de Hibernate tras un `UPDATE` por JDBC. |
+| Modificaciones | La prueba `bandejaFiltersAndAreaRestrictionWork` ahora calcula la fecha límite con el `Clock` de la aplicación y limpia el `EntityManager` después del `UPDATE` (commit `6b2f056`). |
+| Responsable | [Completar: Persona 1] |
+
+### IA-07 — Fase III: endurecimiento de seguridad OWASP
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-13 |
+| Herramienta | T3 Code: Claude (Claude Code) como orquestador y revisor; subagente Gemini 4 Hydrogen (Antigravity) como implementador |
+| Prompt | Endurecer `SecurityConfig` en `feature/seguridad-owasp`: cabeceras `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` y CSP básica compatible con Swagger; CORS leído de `CORS_ALLOWED_ORIGINS` y validado al arrancar; ningún stacktrace en `ProblemDetail`; límite de intentos fallidos en `/api/auth/login` con 429 y `Retry-After`; pruebas de cabeceras, CORS, 401/403, 500 genérico y limitador. |
+| Resultado generado | Cabeceras y CSP, `CorsOriginsValidator` (rechaza `*` con credenciales y en `prod`), manejador genérico de 500, `server.error.include-*` en `never`, `LoginRateLimiter` en memoria por IP + correo con `Clock` inyectable y propiedades configurables, documentación en `docs/08-configuracion.md` y pruebas (PR #1). |
+| ¿Se utilizó? | Sí. |
+| Validación realizada | Revisión del diff (la IP se toma de `remoteAddr`, no de `X-Forwarded-For`, para que no se pueda falsificar); suite completa de backend contra MySQL 9 (87 pruebas) y suite combinada con S3 (109 pruebas), sin conflictos de merge. |
+| Modificaciones | Ninguna. Limitación conocida: el limitador es por IP + correo, así que no frena un ataque que rote correos; es suficiente como protección básica. |
+| Responsable | [Completar: Persona 1] |
+
+### IA-08 — Sprint S6: comentarios y notificaciones (HU-10, HU-17, RN-16)
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-13 |
+| Herramienta | T3 Code: Claude (Claude Code) como orquestador y revisor; subagente Gemini 4 Hydrogen (Antigravity) como implementador |
+| Prompt | Implementar en `feature/comentarios-notificaciones`, sobre S3 y la rama de seguridad, los comentarios por solicitud con la misma visibilidad que el detalle, las notificaciones del usuario (listar, contar no leídas, marcar una o todas) y su creación con `@TransactionalEventListener(AFTER_COMMIT)` al asignar, cambiar estado o comentar, sin que un fallo de notificación afecte la operación principal; en el frontend, caja de comentarios, `NotificacionesPage` y campana con contador. |
+| Resultado generado | Paquetes `comentario` y `notificacion`, `NotificacionListener` con `REQUIRES_NEW` y captura de errores, cálculo de destinatarios (nunca el autor), pantallas y campana con sondeo cada 30 s, y pruebas (PR #3). |
+| ¿Se utilizó? | Sí. |
+| Validación realizada | Suite completa de backend contra MySQL 9 (124 pruebas); lint, build y 36 pruebas de frontend. Se revisó el listener: las notificaciones solo se crean si la transacción confirma. |
+| Modificaciones | Ninguna. Decisión: un usuario sin relación con la solicitud recibe 404 en comentarios (como en detalle, evidencias e historial) para no revelar que existe. |
+| Responsable | [Completar: Persona 1] |
