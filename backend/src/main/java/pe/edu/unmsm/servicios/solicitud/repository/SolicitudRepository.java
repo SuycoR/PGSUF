@@ -26,27 +26,82 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
             @Param("categoriaId") Integer categoriaId, Pageable pageable);
 
     /** HU-07: inbox for supervisor (technical only), area staff (own area), and admin (all). */
+    default Page<Solicitud> buscarBandeja(
+            boolean soloTecnicas,
+            String categoriaTecnica,
+            Integer areaId,
+            Integer estadoId,
+            Integer categoriaId,
+            Integer prioridadId,
+            Boolean vencidas,
+            LocalDateTime ahora,
+            Pageable pageable) {
+        if (Boolean.TRUE.equals(vencidas)) {
+            return buscarBandejaVencidas(soloTecnicas, categoriaTecnica, areaId, estadoId, categoriaId, prioridadId, ahora, pageable);
+        } else if (Boolean.FALSE.equals(vencidas)) {
+            return buscarBandejaNoVencidas(soloTecnicas, categoriaTecnica, areaId, estadoId, categoriaId, prioridadId, ahora, pageable);
+        } else {
+            return buscarBandejaTodas(soloTecnicas, categoriaTecnica, areaId, estadoId, categoriaId, prioridadId, pageable);
+        }
+    }
+
     @EntityGraph(attributePaths = {"tipoSolicitud", "tipoSolicitud.categoria", "tipoSolicitud.area", "estado", "prioridad"})
     @Query("""
             SELECT s FROM Solicitud s
-            WHERE (:soloTecnicas IS FALSE OR s.tipoSolicitud.categoria.nombre = :categoriaTecnica)
+            WHERE (:soloTecnicas = false OR s.tipoSolicitud.categoria.nombre = :categoriaTecnica)
               AND (:areaId IS NULL OR s.tipoSolicitud.area.id = :areaId)
               AND (:estadoId IS NULL OR s.estado.id = :estadoId)
               AND (:categoriaId IS NULL OR s.tipoSolicitud.categoria.id = :categoriaId)
               AND (:prioridadId IS NULL OR s.prioridad.id = :prioridadId)
-              AND (:vencidas IS NULL
-                   OR (:vencidas IS TRUE AND s.estado.esFinal = FALSE AND s.fechaLimite < :ahora)
-                   OR (:vencidas IS FALSE AND (s.estado.esFinal = TRUE OR s.fechaLimite >= :ahora)))
+              AND s.estado.esFinal = false
+              AND s.fechaLimite < :ahora
             """)
-    Page<Solicitud> buscarBandeja(
+    Page<Solicitud> buscarBandejaVencidas(
             @Param("soloTecnicas") boolean soloTecnicas,
             @Param("categoriaTecnica") String categoriaTecnica,
             @Param("areaId") Integer areaId,
             @Param("estadoId") Integer estadoId,
             @Param("categoriaId") Integer categoriaId,
             @Param("prioridadId") Integer prioridadId,
-            @Param("vencidas") Boolean vencidas,
             @Param("ahora") LocalDateTime ahora,
+            Pageable pageable);
+
+    @EntityGraph(attributePaths = {"tipoSolicitud", "tipoSolicitud.categoria", "tipoSolicitud.area", "estado", "prioridad"})
+    @Query("""
+            SELECT s FROM Solicitud s
+            WHERE (:soloTecnicas = false OR s.tipoSolicitud.categoria.nombre = :categoriaTecnica)
+              AND (:areaId IS NULL OR s.tipoSolicitud.area.id = :areaId)
+              AND (:estadoId IS NULL OR s.estado.id = :estadoId)
+              AND (:categoriaId IS NULL OR s.tipoSolicitud.categoria.id = :categoriaId)
+              AND (:prioridadId IS NULL OR s.prioridad.id = :prioridadId)
+              AND (s.estado.esFinal = true OR s.fechaLimite >= :ahora)
+            """)
+    Page<Solicitud> buscarBandejaNoVencidas(
+            @Param("soloTecnicas") boolean soloTecnicas,
+            @Param("categoriaTecnica") String categoriaTecnica,
+            @Param("areaId") Integer areaId,
+            @Param("estadoId") Integer estadoId,
+            @Param("categoriaId") Integer categoriaId,
+            @Param("prioridadId") Integer prioridadId,
+            @Param("ahora") LocalDateTime ahora,
+            Pageable pageable);
+
+    @EntityGraph(attributePaths = {"tipoSolicitud", "tipoSolicitud.categoria", "tipoSolicitud.area", "estado", "prioridad"})
+    @Query("""
+            SELECT s FROM Solicitud s
+            WHERE (:soloTecnicas = false OR s.tipoSolicitud.categoria.nombre = :categoriaTecnica)
+              AND (:areaId IS NULL OR s.tipoSolicitud.area.id = :areaId)
+              AND (:estadoId IS NULL OR s.estado.id = :estadoId)
+              AND (:categoriaId IS NULL OR s.tipoSolicitud.categoria.id = :categoriaId)
+              AND (:prioridadId IS NULL OR s.prioridad.id = :prioridadId)
+            """)
+    Page<Solicitud> buscarBandejaTodas(
+            @Param("soloTecnicas") boolean soloTecnicas,
+            @Param("categoriaTecnica") String categoriaTecnica,
+            @Param("areaId") Integer areaId,
+            @Param("estadoId") Integer estadoId,
+            @Param("categoriaId") Integer categoriaId,
+            @Param("prioridadId") Integer prioridadId,
             Pageable pageable);
 
     /** HU-09: requests where the technician is the assigned responsible user. */
