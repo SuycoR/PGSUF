@@ -252,6 +252,7 @@ class GestionSolicitudesIntegrationTest {
         Long tecnicaVencida = crearSolicitud(ana, proyector, alta);
         Long tramiteSec = crearSolicitud(ana, rectificacionNota, media,
                 new MockMultipartFile("archivos", "sustento.pdf", "application/pdf", PDF));
+        em.flush();
         // Use the application clock (America/Lima), not MySQL NOW(), so the test does not depend on the DB timezone.
         jdbc.update("UPDATE solicitud SET fecha_limite = ? WHERE id = ?",
                 LocalDateTime.now(clock).minusHours(2), tecnicaVencida);

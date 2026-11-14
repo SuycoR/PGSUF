@@ -29,14 +29,14 @@ public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
     @EntityGraph(attributePaths = {"tipoSolicitud", "tipoSolicitud.categoria", "tipoSolicitud.area", "estado", "prioridad"})
     @Query("""
             SELECT s FROM Solicitud s
-            WHERE (:soloTecnicas = false OR s.tipoSolicitud.categoria.nombre = :categoriaTecnica)
+            WHERE (:soloTecnicas IS FALSE OR s.tipoSolicitud.categoria.nombre = :categoriaTecnica)
               AND (:areaId IS NULL OR s.tipoSolicitud.area.id = :areaId)
               AND (:estadoId IS NULL OR s.estado.id = :estadoId)
               AND (:categoriaId IS NULL OR s.tipoSolicitud.categoria.id = :categoriaId)
               AND (:prioridadId IS NULL OR s.prioridad.id = :prioridadId)
               AND (:vencidas IS NULL
-                   OR (:vencidas = true AND s.estado.esFinal = false AND s.fechaLimite < :ahora)
-                   OR (:vencidas = false AND (s.estado.esFinal = true OR s.fechaLimite >= :ahora)))
+                   OR (:vencidas IS TRUE AND s.estado.esFinal = FALSE AND s.fechaLimite < :ahora)
+                   OR (:vencidas IS FALSE AND (s.estado.esFinal = TRUE OR s.fechaLimite >= :ahora)))
             """)
     Page<Solicitud> buscarBandeja(
             @Param("soloTecnicas") boolean soloTecnicas,
