@@ -139,3 +139,17 @@ Copiar este bloque para cada registro nuevo:
 | Validación realizada | Ejecución exitosa de pruebas unitarias y web de backend (`BUILD SUCCESS`, 22 tests); verificación de tipos TypeScript y empaquetado Vite (`npm run build` sin errores); ejecución de vitest (8 archivos de prueba pasados, 43 tests exitosos). |
 | Modificaciones | Se ajustó el título del `DashboardPage` a `Dashboard` para compatibilidad exacta con los tests de navegación previa y se configuró strictness lenient en mocks de servicios. |
 | Responsable | Persona 2 |
+
+### IA-10 — Persona 3: Módulo de Administración (S7), Docker, CI/CD (GitHub Actions) y Despliegue Cloud
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-14 |
+| Herramienta | Antigravity (DeepMind) |
+| Prompt | Implementar el alcance completo de la Persona 3 en la rama `feature/admin-devops`: completar los CRUDs administrativos bajo `/api/admin/...` para Usuarios, Áreas, Categorías, Tipos de Solicitud, Prioridades, Estados, Transiciones y Ambientes con control de acceso `hasRole('ADMIN')` y soft-delete (`PUT /{id}/activo`); desarrollar la interfaz de administración en React (`AdminPage.tsx`) con pestañas interactivas, tablas, filtros y modales de creación/edición; configurar contenedores Docker multi-stage para backend (Maven + JRE 21) y frontend (Vite + Nginx reverse proxy); armar `docker-compose.yml` en la raíz con red interna, volúmenes de MySQL y uploads; estructurar el pipeline de GitHub Actions (`.github/workflows/ci.yml`) con jobs para backend, frontend y Docker; y documentar la guía de despliegue en la nube (`docs/10-despliegue-cloud.md`). |
+| Resultado generado | Controladores REST bajo `pe.edu.unmsm.servicios.admin.controller` para las 8 entidades; servicio unificado `AdminCatalogoService` con validaciones de unicidad y reglas de negocio; ampliación de `UsuarioService` y `AdminUsuarioController`; cliente API y tipos en TypeScript; vista integral con pestañas y modales en `AdminPage.tsx` reemplazando `<EnConstruccion />` en `/admin`; `backend/Dockerfile`, `frontend/app/Dockerfile`, `nginx.conf`, `docker-compose.yml`, `.env.example`, `.github/workflows/ci.yml` y `docs/10-despliegue-cloud.md`. |
+| ¿Se utilizó? | Sí, validado e integrado en su totalidad. |
+| Validación realizada | Compilación y ejecución de tests backend (`AdminCatalogoServiceTest`, `AdminAreaControllerWebTest`, `AdminUsuarioControllerWebTest` - 13/13 pasados); verificación frontend de linting (`oxlint` 0 errores), build de TypeScript (`tsc -b && vite build` exitoso) y ejecución de vitest (9 archivos de prueba, 47/47 tests pasados). |
+| Modificaciones | Se independizó la limpieza de alertas en `AdminPage` para no borrar el mensaje de éxito al recargar datos tras activar/desactivar un registro; se eliminó el import huérfano de `EnConstruccion` en `AppRoutes.tsx`. |
+| Responsable | Persona 3 |
+

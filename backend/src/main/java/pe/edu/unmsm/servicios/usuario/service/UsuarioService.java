@@ -47,6 +47,41 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    @Transactional(readOnly = true)
+    public Usuario obtenerPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> BusinessException.notFound("Usuario no encontrado",
+                        "El usuario solicitado no existe."));
+    }
+
+    @Transactional
+    public Usuario actualizar(Long id, String nombre, String correo, String password, String rolNombre, Integer areaId) {
+        Usuario usuario = obtenerPorId(id);
+        String correoNormalizado = Correos.normalizar(correo);
+        if (usuarioRepository.existsByCorreoAndIdNot(correoNormalizado, id)) {
+            throw BusinessException.conflict("CORREO_DUPLICADO", "Correo ya registrado",
+                    "El correo ya pertenece a otro usuario.");
+        }
+
+        Rol rol = rolRepository.findByNombre(rolNombre)
+                .orElseThrow(() -> BusinessException.unprocessable("ROL_INVALIDO", "Rol inválido",
+                        "El rol '" + rolNombre + "' no existe."));
+        Area area = resolverArea(rol, areaId);
+
+        usuario.actualizar(nombre.trim(), rol, area);
+        if (password != null && !password.isBlank()) {
+            usuario.setPasswordHash(passwordEncoder.encode(password));
+        }
+        return usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public Usuario cambiarActivo(Long id, boolean activo) {
+        Usuario usuario = obtenerPorId(id);
+        usuario.setActivo(activo);
+        return usuarioRepository.save(usuario);
+    }
+
     /** RN-10: area is mandatory for TECNICO and PERSONAL_AREA, and must be empty for the other roles. */
     private Area resolverArea(Rol rol, Integer areaId) {
         if (!rol.requiereArea()) {

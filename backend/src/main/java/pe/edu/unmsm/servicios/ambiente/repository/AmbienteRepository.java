@@ -31,4 +31,10 @@ public interface AmbienteRepository extends JpaRepository<Ambiente, Integer> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT a FROM Ambiente a WHERE a.id = :id")
     Optional<Ambiente> findByIdForUpdate(@Param("id") Integer id);
+
+    List<Ambiente> findAllByOrderByPabellonAscPisoAscNombreAsc();
+
+    boolean existsByNombre(String nombre);
+
+    boolean existsByNombreAndIdNot(String nombre, Integer id);
 }

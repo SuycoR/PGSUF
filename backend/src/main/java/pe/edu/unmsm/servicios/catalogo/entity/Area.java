@@ -24,6 +24,11 @@ public class Area {
     protected Area() {
     }
 
+    public Area(String nombre, boolean activo) {
+        this.nombre = nombre;
+        this.activo = activo;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -32,7 +37,15 @@ public class Area {
         return nombre;
     }
 
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     public boolean isActivo() {
         return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

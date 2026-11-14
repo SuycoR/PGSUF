@@ -44,6 +44,22 @@ public class EstadoTransicion {
     protected EstadoTransicion() {
     }
 
+    public EstadoTransicion(Estado estadoOrigen, Estado estadoDestino, Rol rol, String ambito, boolean requiereMotivo) {
+        this.estadoOrigen = estadoOrigen;
+        this.estadoDestino = estadoDestino;
+        this.rol = rol;
+        this.ambito = ambito;
+        this.requiereMotivo = requiereMotivo;
+    }
+
+    public void actualizar(Estado estadoOrigen, Estado estadoDestino, Rol rol, String ambito, boolean requiereMotivo) {
+        this.estadoOrigen = estadoOrigen;
+        this.estadoDestino = estadoDestino;
+        this.rol = rol;
+        this.ambito = ambito;
+        this.requiereMotivo = requiereMotivo;
+    }
+
     public Integer getId() {
         return id;
     }

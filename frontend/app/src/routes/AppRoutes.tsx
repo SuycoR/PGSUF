@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from 'react-router';
 
 import { useAuth } from '../auth/useAuth';
 import { AppLayout } from '../components/layout/AppLayout';
-import { EnConstruccion } from '../pages/EnConstruccion';
 import { LoginPage } from '../pages/LoginPage';
 import { NotificacionesPage } from '../pages/NotificacionesPage';
 import { RegistroPage } from '../pages/RegistroPage';
@@ -15,6 +14,7 @@ import { SolicitudDetallePage } from '../pages/solicitudes/SolicitudDetallePage'
 import { MisReservasPage } from '../pages/reservas/MisReservasPage';
 import { AprobacionReservasPage } from '../pages/reservas/AprobacionReservasPage';
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
+import { AdminPage } from '../pages/admin/AdminPage';
 import { NoEncontradaPage, SinPermisoPage } from '../pages/SinPermisoPage';
 import { inicioPara, rolesDe } from './menu';
 import { RequireAuth } from './RequireAuth';
@@ -68,7 +68,7 @@ export function AppRoutes() {
         />
         <Route
           path="/admin"
-          element={protegida('/admin', <EnConstruccion titulo="Administración" historia="HU-12" sprint="S7" />)}
+          element={protegida('/admin', <AdminPage />)}
         />
         <Route path="/notificaciones" element={<NotificacionesPage />} />
         <Route path="/sin-permiso" element={<SinPermisoPage />} />
