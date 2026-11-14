@@ -1,0 +1,100 @@
+.notificaciones-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.notificaciones-encabezado h1 {
+  margin: 0;
+}
+
+.notificaciones-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.notificaciones-filtros .campo {
+  min-width: 200px;
+}
+
+.lista-notificaciones {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.notificacion-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-borde);
+}
+
+.notificacion-no-leida {
+  border-left: 4px solid var(--color-acento);
+  background: var(--color-fondo-alt);
+}
+
+.notificacion-cuerpo {
+  flex: 1 1 280px;
+}
+
+.notificacion-titulo-fila {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.notificacion-etiqueta-nueva {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-primario);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.notificacion-mensaje {
+  margin: 0 0 0.35rem;
+}
+
+.notificacion-fecha {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+}
+
+.notificacion-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.notificacion-acciones .btn-pequeno,
+.paginacion .btn-pequeno {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.vacio {
+  color: var(--color-texto-suave);
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}

@@ -11,6 +11,18 @@ export function formatearFechaHora(iso: string): string {
   return FECHA_HORA.format(new Date(iso));
 }
 
+export function formatearFecha(iso: string): string {
+  const partes = iso.split('T')[0].split('-');
+  if (partes.length === 3) {
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
+  return new Intl.DateTimeFormat('es-PE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(new Date(iso));
+}
+
 export function formatearTamano(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;

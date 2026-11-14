@@ -100,6 +100,18 @@ public class Solicitud {
         }
     }
 
+    public void asignarResponsable(Usuario responsable) {
+        this.responsable = responsable;
+    }
+
+    public void cambiarPrioridad(Prioridad prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public void setRespuesta(String respuesta) {
+        this.respuesta = respuesta;
+    }
+
     public Long getId() {
         return id;
     }

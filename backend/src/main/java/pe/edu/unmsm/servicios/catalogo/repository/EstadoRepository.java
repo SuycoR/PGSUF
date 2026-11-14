@@ -12,5 +12,7 @@ public interface EstadoRepository extends JpaRepository<Estado, Integer> {
 
     Optional<Estado> findByNombre(String nombre);
 
+    Optional<Estado> findByNombreAndAmbitoIn(String nombre, Collection<String> ambitos);
+
     List<Estado> findByAmbitoInOrderByOrden(Collection<String> ambitos);
 }

@@ -1,0 +1,124 @@
+.reservas-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.reservas-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--color-borde);
+  margin-bottom: 1rem;
+}
+
+.reservas-tab-btn {
+  background: none;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--color-texto-suave);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+}
+
+.reservas-tab-btn:hover {
+  color: var(--color-primario);
+}
+
+.reservas-tab-btn.activo {
+  color: var(--color-primario);
+  border-bottom-color: var(--color-acento);
+  font-weight: 600;
+}
+
+.disponibilidad-box {
+  background: var(--color-fondo-alt);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 1rem;
+  margin-top: 0.75rem;
+}
+
+.disponibilidad-box h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-primario);
+}
+
+.intervalos-ocupados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.badge-intervalo {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #f87171;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.badge-disponible {
+  color: var(--color-exito);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.ambientes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ambiente-card {
+  background: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  padding: 1rem;
+  box-shadow: var(--sombra);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ambiente-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+}
+
+.ambiente-meta {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+  margin-bottom: 0.75rem;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 33, 71, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: var(--color-fondo);
+  border-radius: var(--radio);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 480px;
+  padding: 1.5rem;
+}
+
+.modal-content h3 {
+  margin: 0 0 1rem;
+}

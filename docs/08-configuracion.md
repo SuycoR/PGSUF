@@ -25,7 +25,10 @@
 | `DB_PASSWORD` | — | Contraseña del usuario de la aplicación |
 | `JWT_SECRET` | — | Clave de al menos 32 bytes, en Base64 |
 | `JWT_EXPIRATION_MINUTES` | `60` | Duración del token |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Origen del frontend |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Orígenes permitidos separados por comas (obligatorio en `prod`; no permite `*` con credenciales) |
+| `CORS_ALLOW_CREDENTIALS` | `false` | Permite credenciales CORS (`false` por defecto al usar JWT en cabecera `Authorization`) |
+| `LOGIN_MAX_ATTEMPTS` | `5` | Máximo de intentos fallidos de login por correo e IP antes de devolver `429` |
+| `LOGIN_WINDOW_MINUTES` | `15` | Ventana en minutos para el conteo de intentos fallidos de login |
 | `UPLOAD_DIR` | `./uploads` | Carpeta de evidencias |
 | `ADMIN_EMAIL` | — | Correo del administrador inicial |
 | `ADMIN_PASSWORD` | — | Contraseña del administrador inicial |
@@ -40,6 +43,9 @@ DB_PASSWORD=
 JWT_SECRET=
 JWT_EXPIRATION_MINUTES=60
 CORS_ALLOWED_ORIGINS=http://localhost:5173
+CORS_ALLOW_CREDENTIALS=false
+LOGIN_MAX_ATTEMPTS=5
+LOGIN_WINDOW_MINUTES=15
 UPLOAD_DIR=./uploads
 ADMIN_EMAIL=
 ADMIN_PASSWORD=
@@ -93,23 +99,34 @@ spring:
     problemdetails:
       enabled: true
 
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-exception: false
+    include-binding-errors: never
+
 app:
   jwt:
     secret: ${JWT_SECRET}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+    allow-credentials: ${CORS_ALLOW_CREDENTIALS:false}
   upload-dir: ${UPLOAD_DIR:./uploads}
   admin:
     email: ${ADMIN_EMAIL:}
     password: ${ADMIN_PASSWORD:}
+  login-rate-limit:
+    max-attempts: ${LOGIN_MAX_ATTEMPTS:5}
+    window-minutes: ${LOGIN_WINDOW_MINUTES:15}
 
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
 ```
 
-En el perfil `prod`, Swagger se desactiva (`springdoc.api-docs.enabled: false`).
+En el perfil `prod`, Swagger se desactiva (`springdoc.api-docs.enabled: false`) y `CORS_ALLOWED_ORIGINS` es obligatorio (sin comodín `*`).
 
 ## Administrador inicial
 

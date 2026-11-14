@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthProvider } from '../../auth/AuthContext';
+import type { Historial, SolicitudDetalle, TransicionDisponible } from '../../api/types';
 import { guardarSesion } from '../../auth/sessionStorage';
 import { AppRoutes } from '../../routes/AppRoutes';
 import { CATALOGOS, fakeApi, json } from '../../test/fakeApi';
@@ -50,6 +51,7 @@ const DETALLE_RUTAS = {
   'GET /api/solicitudes/15/historial': () => json(200, HISTORIAL),
   'GET /api/solicitudes/15/evidencias': () =>
     json(200, [{ id: 7, nombreArchivo: 'sustento.pdf', tipoMime: 'application/pdf', tamanoBytes: 2048, fechaSubida: '2026-10-17T09:30:00', subidoPor: 'Ana' }]),
+  'GET /api/solicitudes/15/comentarios': () => json(200, []),
 };
 
 beforeEach(() => {
@@ -186,5 +188,235 @@ describe('SolicitudDetallePage', () => {
     renderEn('/solicitudes/999');
 
     await waitFor(() => expect(screen.getByRole('heading', { name: 'Solicitud no encontrada.' })).toBeInTheDocument());
+  });
+});
+
+describe('BandejaPage', () => {
+  it('HU-07: lists requests, filters by vencidas and prioridad, and links to detail', async () => {
+    guardarSesion({ token: 't', usuario: { id: 3, nombre: 'Sup', correo: 'sup@unmsm.edu.pe', rol: 'SUPERVISOR', areaId: null } });
+    const fetchMock = fakeApi({
+      ...CATALOGOS,
+      'GET /api/solicitudes': () =>
+        json(200, {
+          content: [
+            {
+              id: 21,
+              codigo: 'SOL-2026-0021',
+              categoria: 'Soporte técnico e infraestructura',
+              tipo: 'Proyector',
+              prioridad: 'Alta',
+              estado: 'En evaluación',
+              estadoFinal: false,
+              fechaRegistro: '2026-10-17T09:30:00',
+              fechaLimite: '2026-10-18T09:30:00',
+              vencida: true,
+            },
+          ],
+          page: { size: 20, number: 0, totalElements: 1, totalPages: 1 },
+        }),
+    });
+    renderEn('/bandeja');
+
+    const fila = (await screen.findByRole('link', { name: 'SOL-2026-0021' })).closest('tr')!;
+    expect(within(fila).getByText('Alta')).toBeInTheDocument();
+    expect(within(fila).getByText('Vencida')).toBeInTheDocument();
+
+    await userEvent.selectOptions(screen.getByLabelText('Prioridad'), '1');
+    await userEvent.selectOptions(screen.getByLabelText('Vencidas'), 'true');
+
+    await waitFor(() => {
+      expect(
+        fetchMock.mock.calls.some(([url]) => String(url).includes('/api/solicitudes?') && String(url).includes('prioridadId=1') && String(url).includes('vencidas=true')),
+      ).toBe(true);
+    });
+  });
+});
+
+describe('AsignadasPage', () => {
+  it('HU-09: lists requests assigned to the technician', async () => {
+    guardarSesion({ token: 't', usuario: { id: 6, nombre: 'Luis Tec', correo: 'tec@unmsm.edu.pe', rol: 'TECNICO', areaId: 1 } });
+    fakeApi({
+      ...CATALOGOS,
+      'GET /api/solicitudes/asignadas': () =>
+        json(200, {
+          content: [
+            {
+              id: 30,
+              codigo: 'SOL-2026-0030',
+              categoria: 'Soporte técnico e infraestructura',
+              tipo: 'Proyector',
+              prioridad: 'Media',
+              estado: 'Asignada',
+              estadoFinal: false,
+              fechaRegistro: '2026-10-18T10:00:00',
+              fechaLimite: '2026-10-19T10:00:00',
+              vencida: false,
+            },
+          ],
+          page: { size: 10, number: 0, totalElements: 1, totalPages: 1 },
+        }),
+    });
+    renderEn('/asignadas');
+
+    expect(await screen.findByRole('link', { name: 'SOL-2026-0030' })).toBeInTheDocument();
+    expect(screen.getByText('Asignada')).toBeInTheDocument();
+  });
+});
+
+describe('SolicitudDetallePage gestion', () => {
+  it('HU-08 & HU-07: supervisor assigns technician, updates priority, and validates rejection reason', async () => {
+    guardarSesion({ token: 't', usuario: { id: 3, nombre: 'Sup', correo: 'sup@unmsm.edu.pe', rol: 'SUPERVISOR', areaId: null } });
+    let detalleActual: SolicitudDetalle = {
+      ...DETALLE,
+      id: 40,
+      codigo: 'SOL-2026-0040',
+      categoria: 'Soporte técnico e infraestructura',
+      tipo: 'Proyector',
+      area: 'Soporte técnico',
+      areaId: 1,
+      prioridad: 'Media',
+      prioridadId: 2,
+      estado: 'En evaluación',
+    };
+    let historialActual: Historial[] = [
+      { id: 1, estadoAnterior: null, estadoNuevo: 'Registrada', usuario: 'Ana', observacion: null, fecha: '2026-10-17T09:30:00' },
+    ];
+    let transicionesActuales: TransicionDisponible[] = [
+      { estadoDestinoId: 3, nombre: 'Asignada', esFinal: false, requiereMotivo: false },
+      { estadoDestinoId: 8, nombre: 'Rechazada', esFinal: true, requiereMotivo: true },
+    ];
+
+    fakeApi({
+      ...CATALOGOS,
+      'GET /api/solicitudes/40': () => json(200, detalleActual),
+      'GET /api/solicitudes/40/historial': () => json(200, historialActual),
+      'GET /api/solicitudes/40/evidencias': () => json(200, []),
+      'GET /api/solicitudes/40/transiciones': () => json(200, transicionesActuales),
+      'GET /api/usuarios/tecnicos': () =>
+        json(200, [{ id: 6, nombre: 'Luis Tec', correo: 'tec@unmsm.edu.pe', rol: 'TECNICO', areaId: 1, activo: true }]),
+      'PUT /api/solicitudes/40/prioridad': (init) => {
+        const body = JSON.parse(String(init?.body)) as { prioridadId: number };
+        detalleActual = { ...detalleActual, prioridad: body.prioridadId === 1 ? 'Alta' : 'Media', prioridadId: body.prioridadId };
+        return json(200, detalleActual);
+      },
+      'PUT /api/solicitudes/40/asignar': () => {
+        detalleActual = { ...detalleActual, estado: 'Asignada', responsable: { id: 6, nombre: 'Luis Tec' } };
+        historialActual = [
+          ...historialActual,
+          { id: 2, estadoAnterior: 'En evaluación', estadoNuevo: 'Asignada', usuario: 'Sup', observacion: 'Asignada a Luis Tec', fecha: '2026-10-17T10:00:00' },
+        ];
+        transicionesActuales = [];
+        return json(200, detalleActual);
+      },
+    });
+    renderEn('/solicitudes/40');
+
+    expect(await screen.findByLabelText('Técnico responsable')).toBeInTheDocument();
+    // Asignada is handled by the Asignar panel, not duplicated as a bare state button
+    expect(screen.queryByRole('button', { name: 'Asignada' })).not.toBeInTheDocument();
+
+    // Rejection without reason is blocked client-side
+    await userEvent.click(screen.getByRole('button', { name: 'Rechazada' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Debe indicar el motivo para pasar a Rechazada.');
+
+    // Update priority
+    await userEvent.selectOptions(screen.getByLabelText('Prioridad'), '1');
+    await userEvent.click(screen.getByRole('button', { name: 'Actualizar prioridad' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Prioridad actualizada a Alta.');
+
+    // Assign technician and refresh history
+    await userEvent.selectOptions(screen.getByLabelText('Técnico responsable'), '6');
+    await userEvent.click(screen.getByRole('button', { name: 'Asignar' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Solicitud asignada a Luis Tec.');
+    expect(screen.getByText('Asignada a Luis Tec')).toBeInTheDocument();
+  });
+
+  it('HU-09 & HU-15: technician transitions state and uploads additional evidence', async () => {
+    guardarSesion({ token: 't', usuario: { id: 6, nombre: 'Luis Tec', correo: 'tec@unmsm.edu.pe', rol: 'TECNICO', areaId: 1 } });
+    let detalleActual: SolicitudDetalle = {
+      ...DETALLE,
+      id: 41,
+      codigo: 'SOL-2026-0041',
+      estado: 'Asignada',
+      responsable: { id: 6, nombre: 'Luis Tec' },
+    };
+    let evidenciasActuales = [
+      { id: 1, nombreArchivo: 'inicial.png', tipoMime: 'image/png', tamanoBytes: 1024, fechaSubida: '2026-10-17T09:30:00', subidoPor: 'Ana' },
+    ];
+    let historialActual: Historial[] = [
+      { id: 1, estadoAnterior: null, estadoNuevo: 'Asignada', usuario: 'Sup', observacion: null, fecha: '2026-10-17T09:30:00' },
+    ];
+
+    fakeApi({
+      ...CATALOGOS,
+      'GET /api/solicitudes/41': () => json(200, detalleActual),
+      'GET /api/solicitudes/41/historial': () => json(200, historialActual),
+      'GET /api/solicitudes/41/evidencias': () => json(200, evidenciasActuales),
+      'GET /api/solicitudes/41/transiciones': () =>
+        json(200, [{ estadoDestinoId: 4, nombre: 'En atención', esFinal: false, requiereMotivo: false }]),
+      'PUT /api/solicitudes/41/estado': () => {
+        detalleActual = { ...detalleActual, estado: 'En atención' };
+        historialActual = [
+          ...historialActual,
+          { id: 2, estadoAnterior: 'Asignada', estadoNuevo: 'En atención', usuario: 'Luis Tec', observacion: 'Revisando en salón', fecha: '2026-10-17T10:15:00' },
+        ];
+        return json(200, detalleActual);
+      },
+      'POST /api/solicitudes/41/evidencias': () => {
+        const nueva = { id: 2, nombreArchivo: 'reparado.png', tipoMime: 'image/png', tamanoBytes: 512, fechaSubida: '2026-10-17T10:20:00', subidoPor: 'Luis Tec' };
+        evidenciasActuales = [...evidenciasActuales, nueva];
+        return json(201, [nueva]);
+      },
+    });
+    renderEn('/solicitudes/41');
+
+    expect(await screen.findByRole('button', { name: 'En atención' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Técnico responsable')).not.toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText('Comentario u observación'), 'Revisando en salón');
+    await userEvent.click(screen.getByRole('button', { name: 'En atención' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Estado actualizado a En atención.');
+    expect(screen.getByText('Revisando en salón')).toBeInTheDocument();
+
+    const png = new File(['x'], 'reparado.png', { type: 'image/png' });
+    await userEvent.upload(screen.getByLabelText(/Agregar evidencias/), png);
+    await userEvent.click(screen.getByRole('button', { name: 'Subir evidencias' }));
+    expect(await screen.findByText(/reparado\.png/)).toBeInTheDocument();
+  });
+
+  it('HU-10: displays chronological comments, validates blank submission, and posts a new comment', async () => {
+    const lista = [
+      { id: 1, autorId: 1, autor: 'Ana', autorRol: 'SOLICITANTE', texto: 'Primer mensaje', fecha: '2026-10-17T09:35:00' },
+    ];
+    const fetchMock = fakeApi({
+      ...DETALLE_RUTAS,
+      'GET /api/solicitudes/15/comentarios': () => json(200, lista),
+      'POST /api/solicitudes/15/comentarios': (init) => {
+        const body = JSON.parse(String(init?.body)) as { texto: string };
+        return json(201, {
+          id: 2,
+          autorId: 1,
+          autor: 'Ana',
+          autorRol: 'SOLICITANTE',
+          texto: body.texto,
+          fecha: '2026-10-17T09:40:00',
+        });
+      },
+    });
+    renderEn('/solicitudes/15');
+
+    expect(await screen.findByText('Primer mensaje')).toBeInTheDocument();
+
+    // Blank submission is blocked client-side without calling POST
+    await userEvent.click(screen.getByRole('button', { name: 'Enviar comentario' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Escriba un comentario antes de enviar.');
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false);
+
+    // Valid comment is posted and appended
+    await userEvent.type(screen.getByLabelText('Agregar comentario'), 'Adjunto el detalle actualizado');
+    await userEvent.click(screen.getByRole('button', { name: 'Enviar comentario' }));
+
+    expect(await screen.findByText('Adjunto el detalle actualizado')).toBeInTheDocument();
+    expect(screen.getByLabelText('Agregar comentario')).toHaveValue('');
   });
 });

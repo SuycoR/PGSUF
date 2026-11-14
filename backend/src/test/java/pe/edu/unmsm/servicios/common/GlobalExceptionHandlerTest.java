@@ -1,8 +1,10 @@
 package pe.edu.unmsm.servicios.common;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +39,15 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/boom")
         void boom() {
             throw new IllegalStateException("secret internal detail");
+        }
+
+        @GetMapping("/rate-limited")
+        void rateLimited() {
+            throw new DemasiadosIntentosException(120);
+        }
+
+        @GetMapping("/items/{id}")
+        void byId(@PathVariable Long id) {
         }
 
         @PostMapping("/validate")
@@ -74,9 +86,41 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void unexpectedErrorDoesNotLeakInternalDetail() throws Exception {
-        mockMvc.perform(get("/boom"))
+        String body = mockMvc.perform(get("/boom"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.codigo").value("ERROR_INTERNO"))
-                .andExpect(jsonPath("$.detail").value("Ocurrió un error inesperado. Intente nuevamente."));
+                .andExpect(jsonPath("$.detail").value("Ocurrió un error inesperado. Intente nuevamente."))
+                .andReturn().getResponse().getContentAsString();
+
+        assertThat(body)
+                .doesNotContain("secret internal detail")
+                .doesNotContain("IllegalStateException")
+                .doesNotContain("pe.edu.unmsm")
+                .doesNotContain("stackTrace");
+    }
+
+    @Test
+    void malformedJsonAndTypeMismatchDoNotLeakClassNames() throws Exception {
+        String badJson = mockMvc.perform(post("/validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{invalid"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("SOLICITUD_INVALIDA"))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(badJson).doesNotContain("jackson").doesNotContain("com.fasterxml");
+
+        String badParam = mockMvc.perform(get("/items/abc"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.codigo").value("PARAMETRO_INVALIDO"))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(badParam).doesNotContain("java.lang.Long");
+    }
+
+    @Test
+    void rateLimitExceptionSets429AndRetryAfterHeader() throws Exception {
+        mockMvc.perform(get("/rate-limited"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "120"))
+                .andExpect(jsonPath("$.codigo").value("DEMASIADOS_INTENTOS"));
     }
 }

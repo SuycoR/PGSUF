@@ -13,6 +13,12 @@ public class Estado {
 
     public static final String REGISTRADA = "Registrada";
     public static final String EN_EVALUACION = "En evaluación";
+    public static final String ASIGNADA = "Asignada";
+    public static final String EN_ATENCION = "En atención";
+    public static final String RESUELTA = "Resuelta";
+    public static final String CERRADA = "Cerrada";
+    public static final String RECHAZADA = "Rechazada";
+    public static final String APROBADA = "Aprobada";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
