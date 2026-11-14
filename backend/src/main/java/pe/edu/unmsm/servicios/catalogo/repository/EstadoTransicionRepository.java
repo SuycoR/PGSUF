@@ -17,4 +17,13 @@ public interface EstadoTransicionRepository extends JpaRepository<EstadoTransici
     @EntityGraph(attributePaths = {"estadoDestino"})
     Optional<EstadoTransicion> findByEstadoOrigenIdAndEstadoDestinoIdAndRolNombreAndAmbito(
             Integer estadoOrigenId, Integer estadoDestinoId, String rolNombre, String ambito);
+
+    @EntityGraph(attributePaths = {"estadoOrigen", "estadoDestino", "rol"})
+    List<EstadoTransicion> findAllByOrderByAmbitoAscEstadoOrigenOrdenAsc();
+
+    boolean existsByEstadoOrigenIdAndEstadoDestinoIdAndRolIdAndAmbito(
+            Integer estadoOrigenId, Integer estadoDestinoId, Integer rolId, String ambito);
+
+    boolean existsByEstadoOrigenIdAndEstadoDestinoIdAndRolIsNullAndAmbito(
+            Integer estadoOrigenId, Integer estadoDestinoId, String ambito);
 }

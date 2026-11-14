@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -156,7 +156,7 @@ describe('AprobacionReservasPage (HU-14)', () => {
 
     fakeApi({
       'GET /api/reservas': () => json(200, MIS_RESERVAS),
-      'PUT /api/reservas/10/rechazar': (init) => {
+      'PUT /api/reservas/10/rechazar': () => {
         rechazoLlamado = true;
         return json(200, { ...MIS_RESERVAS.content[0], estadoNombre: 'Rechazada' });
       },

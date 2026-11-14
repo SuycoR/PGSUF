@@ -42,6 +42,27 @@ public class TipoSolicitud {
     protected TipoSolicitud() {
     }
 
+    public TipoSolicitud(Categoria categoria, Area area, String nombre, boolean requiereAdjunto, int slaHoras, boolean activo) {
+        this.categoria = categoria;
+        this.area = area;
+        this.nombre = nombre;
+        this.requiereAdjunto = requiereAdjunto;
+        this.slaHoras = slaHoras;
+        this.activo = activo;
+    }
+
+    public void actualizar(Categoria categoria, Area area, String nombre, boolean requiereAdjunto, int slaHoras) {
+        this.categoria = categoria;
+        this.area = area;
+        this.nombre = nombre;
+        this.requiereAdjunto = requiereAdjunto;
+        this.slaHoras = slaHoras;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
     public Integer getId() {
         return id;
     }

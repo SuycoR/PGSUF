@@ -40,6 +40,20 @@ public class Estado {
     protected Estado() {
     }
 
+    public Estado(String nombre, String ambito, int orden, boolean esFinal) {
+        this.nombre = nombre;
+        this.ambito = ambito;
+        this.orden = orden;
+        this.esFinal = esFinal;
+    }
+
+    public void actualizar(String nombre, String ambito, int orden, boolean esFinal) {
+        this.nombre = nombre;
+        this.ambito = ambito;
+        this.orden = orden;
+        this.esFinal = esFinal;
+    }
+
     public Integer getId() {
         return id;
     }

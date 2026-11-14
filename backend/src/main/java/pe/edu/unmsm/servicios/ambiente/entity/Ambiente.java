@@ -77,6 +77,14 @@ public class Ambiente {
         return activo;
     }
 
+    public void actualizar(String nombre, TipoAmbiente tipo, Pabellon pabellon, Integer piso, int capacidad) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.pabellon = pabellon;
+        this.piso = piso;
+        this.capacidad = capacidad;
+    }
+
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
