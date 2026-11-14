@@ -215,6 +215,56 @@ a.btn {
   border-top: 1px solid var(--color-borde);
 }
 
+/* Comments */
+.lista-comentarios {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.comentario-item {
+  padding: 0.75rem 1rem;
+  background: var(--color-fondo-alt);
+  border-left: 3px solid var(--color-primario);
+  border-radius: var(--radio);
+}
+
+.comentario-cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.comentario-rol {
+  font-size: 0.8rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-fondo);
+  border: 1px solid var(--color-borde);
+  color: var(--color-primario);
+  font-weight: 600;
+}
+
+.comentario-fecha {
+  font-size: 0.85rem;
+  color: var(--color-texto-suave);
+  margin-left: auto;
+}
+
+.comentario-texto {
+  margin: 0;
+}
+
+.formulario-comentario {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-borde);
+}
+
 @media (max-width: 768px) {
   .fila-dos {
     grid-template-columns: 1fr;

@@ -3,8 +3,10 @@ import { Link, useLocation, useParams } from 'react-router';
 
 import { catalogos } from '../../api/catalogos';
 import { ApiError } from '../../api/client';
+import { comentarios } from '../../api/comentarios';
 import { solicitudes } from '../../api/solicitudes';
 import type {
+  Comentario,
   Evidencia,
   Historial,
   Prioridad,
@@ -23,9 +25,18 @@ interface Datos {
   historial: Historial[];
   evidencias: Evidencia[];
   transiciones: TransicionDisponible[];
+  comentarios: Comentario[];
 }
 
-/** HU-06, HU-07, HU-08, HU-09, HU-15, HU-16. */
+const ETIQUETAS_ROL: Record<string, string> = {
+  SOLICITANTE: 'Solicitante',
+  TECNICO: 'Técnico',
+  PERSONAL_AREA: 'Personal de área',
+  SUPERVISOR: 'Supervisor',
+  ADMIN: 'Administrador',
+};
+
+/** HU-06, HU-07, HU-08, HU-09, HU-10, HU-15, HU-16. */
 export function SolicitudDetallePage() {
   const { id } = useParams();
   const location = useLocation();
@@ -44,19 +55,23 @@ export function SolicitudDetallePage() {
   const [tecnicos, setTecnicos] = useState<Tecnico[]>([]);
   const [tecnicoId, setTecnicoId] = useState('');
   const [comentario, setComentario] = useState('');
+  const [nuevoComentario, setNuevoComentario] = useState('');
+  const [enviandoComentario, setEnviandoComentario] = useState(false);
+  const [errorComentario, setErrorComentario] = useState<string | null>(null);
   const [archivosNuevos, setArchivosNuevos] = useState<File[]>([]);
   const inputArchivoRef = useRef<HTMLInputElement | null>(null);
 
   const esSupervisor = usuario?.rol === 'SUPERVISOR';
 
   const cargarSolicitud = useCallback(async (solicitudId: number) => {
-    const [detalle, historial, evidencias, transiciones] = await Promise.all([
+    const [detalle, historial, evidencias, transiciones, listaComentarios] = await Promise.all([
       solicitudes.detalle(solicitudId),
       solicitudes.historial(solicitudId),
       solicitudes.evidencias(solicitudId),
       solicitudes.transiciones(solicitudId).catch(() => [] as TransicionDisponible[]),
+      comentarios.listar(solicitudId).catch(() => [] as Comentario[]),
     ]);
-    return { detalle, historial, evidencias, transiciones };
+    return { detalle, historial, evidencias, transiciones, comentarios: listaComentarios };
   }, []);
 
   useEffect(() => {
@@ -193,6 +208,31 @@ export function SolicitudDetallePage() {
     });
   }
 
+  async function manejarEnviarComentario(e: React.FormEvent) {
+    e.preventDefault();
+    if (!datos) return;
+    const texto = nuevoComentario.trim();
+    if (!texto) {
+      setErrorComentario('Escriba un comentario antes de enviar.');
+      return;
+    }
+    if (texto.length > 2000) {
+      setErrorComentario('El comentario admite hasta 2000 caracteres.');
+      return;
+    }
+    setErrorComentario(null);
+    setEnviandoComentario(true);
+    try {
+      const creado = await comentarios.crear(datos.detalle.id, texto);
+      setDatos((prev) => (prev ? { ...prev, comentarios: [...prev.comentarios, creado] } : prev));
+      setNuevoComentario('');
+    } catch (err) {
+      setErrorComentario(err instanceof ApiError ? err.message : 'No se pudo enviar el comentario.');
+    } finally {
+      setEnviandoComentario(false);
+    }
+  }
+
   if (error) {
     return (
       <section className="tarjeta">
@@ -205,7 +245,7 @@ export function SolicitudDetallePage() {
     return <p aria-busy="true">Cargando…</p>;
   }
 
-  const { detalle, historial, evidencias, transiciones } = datos;
+  const { detalle, historial, evidencias, transiciones, comentarios: listaComentarios } = datos;
   const mostrarAsignar = esSupervisor && transiciones.some((t) => t.nombre === 'Asignada');
   const accionesEstado = esSupervisor
     ? transiciones.filter((t) => t.nombre !== 'Asignada')
@@ -371,6 +411,50 @@ export function SolicitudDetallePage() {
             </div>
           </form>
         )}
+      </div>
+
+      <div className="tarjeta">
+        <h2>Comentarios</h2>
+        {listaComentarios.length === 0 ? (
+          <p className="vacio">Sin comentarios aún.</p>
+        ) : (
+          <ul className="lista-comentarios">
+            {listaComentarios.map((c) => (
+              <li key={c.id} className="comentario-item">
+                <div className="comentario-cabecera">
+                  <strong>{c.autor}</strong>
+                  <span className="comentario-rol">{ETIQUETAS_ROL[c.autorRol] ?? c.autorRol}</span>
+                  <span className="comentario-fecha">{formatearFechaHora(c.fecha)}</span>
+                </div>
+                <p className="texto-largo comentario-texto">{c.texto}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form onSubmit={manejarEnviarComentario} className="formulario-comentario">
+          {errorComentario && <div className="alerta-error" role="alert">{errorComentario}</div>}
+          <div className="campo">
+            <label htmlFor="nuevo-comentario">Agregar comentario</label>
+            <textarea
+              id="nuevo-comentario"
+              rows={3}
+              maxLength={2000}
+              value={nuevoComentario}
+              onChange={(e) => {
+                setNuevoComentario(e.target.value);
+                if (errorComentario) setErrorComentario(null);
+              }}
+              placeholder="Escribe un comentario para los involucrados..."
+              disabled={enviandoComentario}
+            />
+          </div>
+          <div className="acciones">
+            <button type="submit" className="btn btn-primario" disabled={enviandoComentario}>
+              Enviar comentario
+            </button>
+          </div>
+        </form>
       </div>
 
       <div className="tarjeta">

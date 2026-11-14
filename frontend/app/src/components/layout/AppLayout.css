@@ -31,7 +31,33 @@
 }
 
 .layout-notificaciones {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radio);
+}
+
+.layout-notificaciones:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.layout-notificaciones-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--color-acento);
+  color: var(--color-primario);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .layout-salir {
