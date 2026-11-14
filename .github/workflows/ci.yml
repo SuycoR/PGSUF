@@ -56,6 +56,19 @@ jobs:
           chmod +x ./mvnw
           ./mvnw clean test
 
+      - name: Print Test Results on Failure
+        if: failure()
+        working-directory: backend
+        run: |
+          echo "==== SUREFIRE TEST FAILURES ===="
+          for f in target/surefire-reports/*.txt; do
+            if grep -Eq "FAILURE!|ERROR!" "$f" 2>/dev/null; then
+              echo ">>> FILE: $f <<<"
+              cat "$f"
+              echo ""
+            fi
+          done
+
   frontend:
     name: Frontend Lint & Test & Build
     runs-on: ubuntu-latest
