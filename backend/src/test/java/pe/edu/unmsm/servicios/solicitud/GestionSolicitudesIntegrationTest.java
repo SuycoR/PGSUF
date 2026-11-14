@@ -6,6 +6,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.EntityManager;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +33,12 @@ class GestionSolicitudesIntegrationTest {
 
     private static final byte[] PDF = "%PDF-1.4\n%sustento".getBytes();
     private static final byte[] PNG = {(byte) 0x89, 'P', 'N', 'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13};
+
+    @Autowired
+    private Clock clock;
+
+    @Autowired
+    private EntityManager em;
 
     @Autowired
     private MockMvc mvc;
@@ -241,7 +252,10 @@ class GestionSolicitudesIntegrationTest {
         Long tecnicaVencida = crearSolicitud(ana, proyector, alta);
         Long tramiteSec = crearSolicitud(ana, rectificacionNota, media,
                 new MockMultipartFile("archivos", "sustento.pdf", "application/pdf", PDF));
-        jdbc.update("UPDATE solicitud SET fecha_limite = DATE_SUB(NOW(), INTERVAL 2 HOUR) WHERE id = ?", tecnicaVencida);
+        // Use the application clock (America/Lima), not MySQL NOW(), so the test does not depend on the DB timezone.
+        jdbc.update("UPDATE solicitud SET fecha_limite = ? WHERE id = ?",
+                LocalDateTime.now(clock).minusHours(2), tecnicaVencida);
+        em.clear(); // drop the stale managed entity so the JDBC update is visible
 
         // SUP sees only technical, filter vencidas=true
         mvc.perform(get("/api/solicitudes?vencidas=true&prioridadId=" + alta)
