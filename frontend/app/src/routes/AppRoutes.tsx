@@ -8,6 +8,8 @@ import { LoginPage } from '../pages/LoginPage';
 import { RegistroPage } from '../pages/RegistroPage';
 import { MisSolicitudesPage } from '../pages/solicitudes/MisSolicitudesPage';
 import { NuevaSolicitudPage } from '../pages/solicitudes/NuevaSolicitudPage';
+import { AsignadasPage } from '../pages/solicitudes/AsignadasPage';
+import { BandejaPage } from '../pages/solicitudes/BandejaPage';
 import { SolicitudDetallePage } from '../pages/solicitudes/SolicitudDetallePage';
 import { NoEncontradaPage, SinPermisoPage } from '../pages/SinPermisoPage';
 import { inicioPara, rolesDe } from './menu';
@@ -46,11 +48,11 @@ export function AppRoutes() {
         />
         <Route
           path="/asignadas"
-          element={protegida('/asignadas', <EnConstruccion titulo="Solicitudes asignadas" historia="HU-09" sprint="S3" />)}
+          element={protegida('/asignadas', <AsignadasPage />)}
         />
         <Route
           path="/bandeja"
-          element={protegida('/bandeja', <EnConstruccion titulo="Bandeja de solicitudes" historia="HU-07" sprint="S3" />)}
+          element={protegida('/bandeja', <BandejaPage />)}
         />
         <Route
           path="/reservas/aprobacion"

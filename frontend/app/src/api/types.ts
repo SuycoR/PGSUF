@@ -66,8 +66,10 @@ export interface SolicitudDetalle {
   categoria: string;
   tipo: string;
   area: string;
+  areaId?: number;
   requiereAdjunto: boolean;
   prioridad: string;
+  prioridadId?: number;
   estado: string;
   estadoFinal: boolean;
   descripcion: string;
@@ -79,6 +81,22 @@ export interface SolicitudDetalle {
   fechaLimite: string;
   fechaCierre: string | null;
   vencida: boolean;
+}
+
+export interface TransicionDisponible {
+  estadoDestinoId: number;
+  nombre: string;
+  esFinal: boolean;
+  requiereMotivo: boolean;
+}
+
+export interface Tecnico {
+  id: number;
+  nombre: string;
+  correo: string;
+  rol: string;
+  areaId: number | null;
+  activo: boolean;
 }
 
 export interface Historial {

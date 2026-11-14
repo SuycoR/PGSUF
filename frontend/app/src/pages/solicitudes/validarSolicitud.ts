@@ -34,7 +34,7 @@ export function validarSolicitud(form: FormularioSolicitud, requiereAdjunto: boo
   return errores;
 }
 
-function validarArchivos(archivos: File[], requiereAdjunto: boolean): string | null {
+export function validarArchivos(archivos: File[], requiereAdjunto: boolean): string | null {
   if (requiereAdjunto && archivos.length === 0) {
     return 'Debe adjuntar el documento de sustento.';
   }
