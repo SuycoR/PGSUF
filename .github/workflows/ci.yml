@@ -15,7 +15,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_DATABASE: servicios_universitarios
+          MYSQL_DATABASE: servicios_universitarios_test
           MYSQL_USER: app_servicios
           MYSQL_PASSWORD: app_servicios_pass
           MYSQL_ROOT_PASSWORD: root_pass
@@ -34,15 +34,25 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Configure MySQL Databases
+        run: |
+          docker exec ${{ job.services.mysql.id }} mysql -u root -proot_pass -e "
+            CREATE DATABASE IF NOT EXISTS servicios_universitarios CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+            CREATE DATABASE IF NOT EXISTS servicios_universitarios_test CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+            GRANT ALL PRIVILEGES ON *.* TO 'app_servicios'@'%';
+            FLUSH PRIVILEGES;
+          "
+
       - name: Run Maven Tests
         working-directory: backend
         env:
-          DB_URL: jdbc:mysql://127.0.0.1:3306/servicios_universitarios?serverTimezone=America/Lima
+          DB_URL: jdbc:mysql://127.0.0.1:3306/servicios_universitarios_test?serverTimezone=America/Lima
           DB_USER: app_servicios
           DB_PASSWORD: app_servicios_pass
           JWT_SECRET: dGhpcy1pcy1hLXZlcnktc2VjdXJlLWFuZC1sb25nLWp3dC1zZWNyZXQta2V5LTMyYnl0ZXM=
           CORS_ALLOWED_ORIGINS: http://localhost:5173
         run: |
+          sed -i 's/\r$//' ./mvnw
           chmod +x ./mvnw
           ./mvnw clean test
 
