@@ -255,7 +255,7 @@ class GestionSolicitudesIntegrationTest {
         em.flush();
         // Use the application clock (America/Lima), not MySQL NOW(), so the test does not depend on the DB timezone.
         jdbc.update("UPDATE solicitud SET fecha_limite = ? WHERE id = ?",
-                LocalDateTime.now(clock).minusHours(2), tecnicaVencida);
+                LocalDateTime.now(clock).minusDays(2), tecnicaVencida);
         em.clear(); // drop the stale managed entity so the JDBC update is visible
 
         // SUP sees only technical, filter vencidas=true
