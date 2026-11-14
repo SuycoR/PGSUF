@@ -91,6 +91,28 @@ public class Usuario {
         return fechaCreacion;
     }
 
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
+    public void setArea(Area area) {
+        this.area = area;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public void actualizar(String nombre, Rol rol, Area area) {
+        this.nombre = nombre;
+        this.rol = rol;
+        this.area = area;
+    }
+
     public void setActivo(boolean activo) {
         this.activo = activo;
     }

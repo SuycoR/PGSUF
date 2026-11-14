@@ -9,4 +9,8 @@ import pe.edu.unmsm.servicios.catalogo.entity.Prioridad;
 public interface PrioridadRepository extends JpaRepository<Prioridad, Integer> {
 
     List<Prioridad> findAllByOrderByOrden();
+
+    boolean existsByNombre(String nombre);
+
+    boolean existsByNombreAndIdNot(String nombre, Integer id);
 }

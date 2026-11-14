@@ -24,6 +24,8 @@ import pe.edu.unmsm.servicios.notificacion.dto.NotificacionDtos.NotificacionResp
 import pe.edu.unmsm.servicios.notificacion.entity.Notificacion;
 import pe.edu.unmsm.servicios.notificacion.entity.TipoNotificacion;
 import pe.edu.unmsm.servicios.notificacion.repository.NotificacionRepository;
+import pe.edu.unmsm.servicios.reserva.event.ReservaRegistradaEvent;
+import pe.edu.unmsm.servicios.reserva.event.ReservaResueltaEvent;
 import pe.edu.unmsm.servicios.solicitud.entity.Solicitud;
 import pe.edu.unmsm.servicios.solicitud.event.EstadoCambiadoEvent;
 import pe.edu.unmsm.servicios.solicitud.event.SolicitudAsignadaEvent;
@@ -154,6 +156,38 @@ public class NotificacionService {
         String titulo = "Nuevo comentario en " + solicitud.getCodigo();
         String mensaje = autorNombre + " agregó un comentario en la solicitud " + solicitud.getCodigo() + ".";
         guardarParaTodos(destinatarios, TipoNotificacion.COMENTARIO_NUEVO, titulo, mensaje, solicitud.getId());
+    }
+
+    /** RN-16: notifies active supervisors when a room reservation is registered. */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void notificarRegistroReserva(ReservaRegistradaEvent event) {
+        List<Usuario> supervisores = usuarios.buscarActivosPorRolYArea("SUPERVISOR", null);
+        if (supervisores.isEmpty()) {
+            return;
+        }
+        LocalDateTime ahora = ahora();
+        String titulo = "Nueva reserva: " + event.codigo();
+        String mensaje = "Se registró una nueva reserva para el ambiente " + event.ambienteNombre() + ".";
+        for (Usuario sup : supervisores) {
+            notificaciones.save(Notificacion.paraReserva(sup, TipoNotificacion.RESERVA_REGISTRADA,
+                    titulo, mensaje, event.reservaId(), ahora));
+        }
+    }
+
+    /** RN-16: notifies the reservation applicant when their reservation is approved or rejected. */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void notificarResolucionReserva(ReservaResueltaEvent event) {
+        Usuario solicitante = usuarios.findById(event.solicitanteId()).orElse(null);
+        if (solicitante == null) {
+            return;
+        }
+        LocalDateTime ahora = ahora();
+        String titulo = "Reserva " + event.estado().toLowerCase() + ": " + event.codigo();
+        String mensaje = "Aprobada".equalsIgnoreCase(event.estado())
+                ? "Tu reserva " + event.codigo() + " fue aprobada."
+                : "Tu reserva " + event.codigo() + " fue rechazada. Motivo: " + (event.motivoRechazo() != null ? event.motivoRechazo() : "");
+        notificaciones.save(Notificacion.paraReserva(solicitante, TipoNotificacion.RESERVA_RESUELTA,
+                titulo, mensaje, event.reservaId(), ahora));
     }
 
     private void guardarParaTodos(List<Long> destinatarios, TipoNotificacion tipo, String titulo, String mensaje,

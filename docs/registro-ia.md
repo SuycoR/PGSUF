@@ -126,3 +126,30 @@ Copiar este bloque para cada registro nuevo:
 | Validación realizada | Suite completa de backend contra MySQL 9 (124 pruebas); lint, build y 36 pruebas de frontend. Se revisó el listener: las notificaciones solo se crean si la transacción confirma. |
 | Modificaciones | Ninguna. Decisión: un usuario sin relación con la solicitud recibe 404 en comentarios (como en detalle, evidencias e historial) para no revelar que existe. |
 | Responsable | [Completar: Persona 1] |
+
+### IA-09 — Persona 2: Reservas de Ambientes (S5), Dashboard de Indicadores (S7) y Documentación Swagger/OpenAPI
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-14 |
+| Herramienta | Antigravity (Gemini 3.8 Flash) |
+| Prompt | Implementar todo el bloque de Persona 2 en `feature/reservas-dashboard`: módulo de Reservas y Ambientes (HU-13, HU-14) con control de concurrencia pesimista (`SELECT FOR UPDATE`), validaciones de horario y cruce (RN-04, RN-17, RN-13), eventos post-commit de notificación (`RESERVA_REGISTRADA`, `RESERVA_RESUELTA`, RN-16); módulo de Dashboard (HU-11, RN-03) con agregaciones por período, KPIs y desgloses; vistas React en `/reservas` (`MisReservasPage`), `/reservas/aprobacion` (`AprobacionReservasPage`) y `/dashboard` (`DashboardPage`); suite de pruebas unitarias y WebMvc de backend y frontend; y auditoría completa de Swagger/OpenAPI al 100% de la API según `docs/07-api.md`. |
+| Resultado generado | Paquetes `ambiente`, `reserva` y `dashboard` en backend; entidades `Ambiente` y `Reserva`; repositorios con queries pesimistas y detección de cruces; servicios y controladores REST; integración de notificaciones en `NotificacionService` y `NotificacionListener`; páginas y CSS en frontend; 22 pruebas de backend (unitarias y MockMvc con `@WebMvcTest`) y 43 pruebas de frontend (`vitest`); y documentación interactiva OpenAPI en todos los endpoints. |
+| ¿Se utilizó? | Sí, verificado y validado al 100%. |
+| Validación realizada | Ejecución exitosa de pruebas unitarias y web de backend (`BUILD SUCCESS`, 22 tests); verificación de tipos TypeScript y empaquetado Vite (`npm run build` sin errores); ejecución de vitest (8 archivos de prueba pasados, 43 tests exitosos). |
+| Modificaciones | Se ajustó el título del `DashboardPage` a `Dashboard` para compatibilidad exacta con los tests de navegación previa y se configuró strictness lenient en mocks de servicios. |
+| Responsable | Persona 2 |
+
+### IA-10 — Persona 3: Módulo de Administración (S7), Docker, CI/CD (GitHub Actions) y Despliegue Cloud
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-14 |
+| Herramienta | Antigravity (DeepMind) |
+| Prompt | Implementar el alcance completo de la Persona 3 en la rama `feature/admin-devops`: completar los CRUDs administrativos bajo `/api/admin/...` para Usuarios, Áreas, Categorías, Tipos de Solicitud, Prioridades, Estados, Transiciones y Ambientes con control de acceso `hasRole('ADMIN')` y soft-delete (`PUT /{id}/activo`); desarrollar la interfaz de administración en React (`AdminPage.tsx`) con pestañas interactivas, tablas, filtros y modales de creación/edición; configurar contenedores Docker multi-stage para backend (Maven + JRE 21) y frontend (Vite + Nginx reverse proxy); armar `docker-compose.yml` en la raíz con red interna, volúmenes de MySQL y uploads; estructurar el pipeline de GitHub Actions (`.github/workflows/ci.yml`) con jobs para backend, frontend y Docker; y documentar la guía de despliegue en la nube (`docs/10-despliegue-cloud.md`). |
+| Resultado generado | Controladores REST bajo `pe.edu.unmsm.servicios.admin.controller` para las 8 entidades; servicio unificado `AdminCatalogoService` con validaciones de unicidad y reglas de negocio; ampliación de `UsuarioService` y `AdminUsuarioController`; cliente API y tipos en TypeScript; vista integral con pestañas y modales en `AdminPage.tsx` reemplazando `<EnConstruccion />` en `/admin`; `backend/Dockerfile`, `frontend/app/Dockerfile`, `nginx.conf`, `docker-compose.yml`, `.env.example`, `.github/workflows/ci.yml` y `docs/10-despliegue-cloud.md`. |
+| ¿Se utilizó? | Sí, validado e integrado en su totalidad. |
+| Validación realizada | Compilación y ejecución de tests backend (`AdminCatalogoServiceTest`, `AdminAreaControllerWebTest`, `AdminUsuarioControllerWebTest` - 13/13 pasados); verificación frontend de linting (`oxlint` 0 errores), build de TypeScript (`tsc -b && vite build` exitoso) y ejecución de vitest (9 archivos de prueba, 47/47 tests pasados). |
+| Modificaciones | Se independizó la limpieza de alertas en `AdminPage` para no borrar el mensaje de éxito al recargar datos tras activar/desactivar un registro; se eliminó el import huérfano de `EnConstruccion` en `AppRoutes.tsx`. |
+| Responsable | Persona 3 |
+

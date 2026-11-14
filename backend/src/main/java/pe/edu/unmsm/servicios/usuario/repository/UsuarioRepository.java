@@ -16,6 +16,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     boolean existsByCorreo(String correo);
 
+    boolean existsByCorreoAndIdNot(String correo, Long id);
+
     boolean existsByRolNombre(String rolNombre);
 
     @EntityGraph(attributePaths = {"rol", "area"})

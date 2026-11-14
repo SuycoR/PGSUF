@@ -18,6 +18,7 @@ public class Estado {
     public static final String RESUELTA = "Resuelta";
     public static final String CERRADA = "Cerrada";
     public static final String RECHAZADA = "Rechazada";
+    public static final String APROBADA = "Aprobada";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +38,20 @@ public class Estado {
     private boolean esFinal;
 
     protected Estado() {
+    }
+
+    public Estado(String nombre, String ambito, int orden, boolean esFinal) {
+        this.nombre = nombre;
+        this.ambito = ambito;
+        this.orden = orden;
+        this.esFinal = esFinal;
+    }
+
+    public void actualizar(String nombre, String ambito, int orden, boolean esFinal) {
+        this.nombre = nombre;
+        this.ambito = ambito;
+        this.orden = orden;
+        this.esFinal = esFinal;
     }
 
     public Integer getId() {

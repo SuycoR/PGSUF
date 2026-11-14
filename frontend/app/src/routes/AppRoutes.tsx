@@ -3,7 +3,6 @@ import { Navigate, Route, Routes } from 'react-router';
 
 import { useAuth } from '../auth/useAuth';
 import { AppLayout } from '../components/layout/AppLayout';
-import { EnConstruccion } from '../pages/EnConstruccion';
 import { LoginPage } from '../pages/LoginPage';
 import { NotificacionesPage } from '../pages/NotificacionesPage';
 import { RegistroPage } from '../pages/RegistroPage';
@@ -12,6 +11,10 @@ import { NuevaSolicitudPage } from '../pages/solicitudes/NuevaSolicitudPage';
 import { AsignadasPage } from '../pages/solicitudes/AsignadasPage';
 import { BandejaPage } from '../pages/solicitudes/BandejaPage';
 import { SolicitudDetallePage } from '../pages/solicitudes/SolicitudDetallePage';
+import { MisReservasPage } from '../pages/reservas/MisReservasPage';
+import { AprobacionReservasPage } from '../pages/reservas/AprobacionReservasPage';
+import { DashboardPage } from '../pages/dashboard/DashboardPage';
+import { AdminPage } from '../pages/admin/AdminPage';
 import { NoEncontradaPage, SinPermisoPage } from '../pages/SinPermisoPage';
 import { inicioPara, rolesDe } from './menu';
 import { RequireAuth } from './RequireAuth';
@@ -45,7 +48,7 @@ export function AppRoutes() {
         <Route path="/solicitudes/:id" element={<SolicitudDetallePage />} />
         <Route
           path="/reservas"
-          element={protegida('/reservas', <EnConstruccion titulo="Mis reservas" historia="HU-13" sprint="S5" />)}
+          element={protegida('/reservas', <MisReservasPage />)}
         />
         <Route
           path="/asignadas"
@@ -57,15 +60,15 @@ export function AppRoutes() {
         />
         <Route
           path="/reservas/aprobacion"
-          element={protegida('/reservas/aprobacion', <EnConstruccion titulo="Aprobación de reservas" historia="HU-14" sprint="S5" />)}
+          element={protegida('/reservas/aprobacion', <AprobacionReservasPage />)}
         />
         <Route
           path="/dashboard"
-          element={protegida('/dashboard', <EnConstruccion titulo="Dashboard" historia="HU-11" sprint="S7" />)}
+          element={protegida('/dashboard', <DashboardPage />)}
         />
         <Route
           path="/admin"
-          element={protegida('/admin', <EnConstruccion titulo="Administración" historia="HU-12" sprint="S7" />)}
+          element={protegida('/admin', <AdminPage />)}
         />
         <Route path="/notificaciones" element={<NotificacionesPage />} />
         <Route path="/sin-permiso" element={<SinPermisoPage />} />

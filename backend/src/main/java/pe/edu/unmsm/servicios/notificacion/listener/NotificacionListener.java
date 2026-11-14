@@ -8,6 +8,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import pe.edu.unmsm.servicios.comentario.event.ComentarioCreadoEvent;
 import pe.edu.unmsm.servicios.notificacion.service.NotificacionService;
+import pe.edu.unmsm.servicios.reserva.event.ReservaRegistradaEvent;
+import pe.edu.unmsm.servicios.reserva.event.ReservaResueltaEvent;
 import pe.edu.unmsm.servicios.solicitud.event.EstadoCambiadoEvent;
 import pe.edu.unmsm.servicios.solicitud.event.SolicitudAsignadaEvent;
 
@@ -42,6 +44,18 @@ public class NotificacionListener {
     public void onComentarioCreado(ComentarioCreadoEvent event) {
         ejecutarSinPropagar("nuevo comentario en solicitud " + event.solicitudId(),
                 () -> notificacionService.notificarComentario(event));
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onReservaRegistrada(ReservaRegistradaEvent event) {
+        ejecutarSinPropagar("registro de reserva " + event.codigo(),
+                () -> notificacionService.notificarRegistroReserva(event));
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onReservaResuelta(ReservaResueltaEvent event) {
+        ejecutarSinPropagar("resolución de reserva " + event.codigo(),
+                () -> notificacionService.notificarResolucionReserva(event));
     }
 
     private void ejecutarSinPropagar(String contexto, Runnable accion) {
