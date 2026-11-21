@@ -31,7 +31,8 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL = '/api';
+// En Vercel se define VITE_API_URL (p. ej. http://localhost:8080/api); por defecto usa el proxy relativo.
+const BASE_URL: string = (import.meta.env?.VITE_API_URL as string | undefined) ?? '/api';
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const response = await enviar(path, init);
