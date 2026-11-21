@@ -66,8 +66,10 @@ export interface SolicitudDetalle {
   categoria: string;
   tipo: string;
   area: string;
+  areaId?: number;
   requiereAdjunto: boolean;
   prioridad: string;
+  prioridadId?: number;
   estado: string;
   estadoFinal: boolean;
   descripcion: string;
@@ -79,6 +81,22 @@ export interface SolicitudDetalle {
   fechaLimite: string;
   fechaCierre: string | null;
   vencida: boolean;
+}
+
+export interface TransicionDisponible {
+  estadoDestinoId: number;
+  nombre: string;
+  esFinal: boolean;
+  requiereMotivo: boolean;
+}
+
+export interface Tecnico {
+  id: number;
+  nombre: string;
+  correo: string;
+  rol: string;
+  areaId: number | null;
+  activo: boolean;
 }
 
 export interface Historial {
@@ -98,3 +116,231 @@ export interface Evidencia {
   fechaSubida: string;
   subidoPor: string;
 }
+
+export interface Comentario {
+  id: number;
+  autorId: number;
+  autor: string;
+  autorRol: string;
+  texto: string;
+  fecha: string;
+}
+
+export type TipoNotificacion =
+  | 'SOLICITUD_REGISTRADA'
+  | 'SOLICITUD_DERIVADA'
+  | 'SOLICITUD_ASIGNADA'
+  | 'ESTADO_CAMBIADO'
+  | 'COMENTARIO_NUEVO'
+  | 'RESERVA_REGISTRADA'
+  | 'RESERVA_RESUELTA';
+
+export interface Notificacion {
+  id: number;
+  tipo: TipoNotificacion | string;
+  titulo: string;
+  mensaje: string;
+  solicitudId: number | null;
+  reservaId: number | null;
+  leida: boolean;
+  fechaCreacion: string;
+  fechaLectura: string | null;
+}
+
+export interface CantidadNoLeidas {
+  cantidad: number;
+}
+
+export type TipoAmbiente = 'AUDITORIO' | 'LABORATORIO' | 'SALON';
+export type Pabellon = 'ANTIGUO' | 'NUEVO' | 'CENTRAL';
+
+export interface Ambiente {
+  id: number;
+  nombre: string;
+  tipo: TipoAmbiente;
+  pabellon: Pabellon;
+  piso: number | null;
+  capacidad: number;
+  activo: boolean;
+}
+
+export interface IntervaloHorario {
+  horaInicio: string;
+  horaFin: string;
+  codigo: string;
+}
+
+export interface DisponibilidadResponse {
+  ambienteId: number;
+  ambienteNombre: string;
+  fecha: string;
+  reservasAprobadas: IntervaloHorario[];
+}
+
+export interface CrearReservaRequest {
+  ambienteId: number;
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  motivo: string;
+}
+
+export interface RechazarReservaRequest {
+  motivo: string;
+}
+
+export interface ReservaResponse {
+  id: number;
+  codigo: string;
+  ambiente: {
+    id: number;
+    nombre: string;
+    tipo: TipoAmbiente;
+    pabellon: Pabellon;
+    piso: number | null;
+  };
+  usuario: {
+    id: number;
+    nombre: string;
+    correo: string;
+  };
+  aprobador: {
+    id: number;
+    nombre: string;
+    correo: string;
+  } | null;
+  estado: {
+    id: number;
+    nombre: string;
+  };
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  motivo: string;
+  motivoRechazo: string | null;
+  fechaRegistro: string;
+  fechaResolucion: string | null;
+}
+
+export interface ReservaResumen {
+  id: number;
+  codigo: string;
+  ambienteId: number;
+  ambienteNombre: string;
+  usuarioId: number;
+  usuarioNombre: string;
+  estadoId: number;
+  estadoNombre: string;
+  fecha: string;
+  horaInicio: string;
+  horaFin: string;
+  motivo: string;
+  motivoRechazo: string | null;
+  fechaRegistro: string;
+  fechaResolucion: string | null;
+}
+
+export interface KpiItem {
+  id: number | null;
+  nombre: string;
+  cantidad: number;
+}
+
+export interface DashboardResponse {
+  totalRegistradas: number;
+  totalPendientes: number;
+  totalAtendidas: number;
+  totalVencidas: number;
+  porcentajeResueltas: number;
+  tiempoPromedioAtencionHoras: number;
+  porCategoria: KpiItem[];
+  porPrioridad: KpiItem[];
+  porResponsable: KpiItem[];
+}
+
+export interface UsuarioAdmin {
+  id: number;
+  nombre: string;
+  correo: string;
+  rol: string;
+  areaId: number | null;
+  activo: boolean;
+}
+
+export interface CrearUsuarioAdminRequest {
+  nombre: string;
+  correo: string;
+  password: string;
+  rol: string;
+  areaId?: number | null;
+}
+
+export interface ActualizarUsuarioAdminRequest {
+  nombre: string;
+  correo: string;
+  password?: string;
+  rol: string;
+  areaId?: number | null;
+}
+
+export interface AreaAdmin {
+  id: number;
+  nombre: string;
+  activo: boolean;
+}
+
+export interface CategoriaAdmin {
+  id: number;
+  nombre: string;
+  activo: boolean;
+  esTramite: boolean;
+}
+
+export interface TipoSolicitudAdmin {
+  id: number;
+  categoriaId: number;
+  categoriaNombre: string;
+  areaId: number;
+  areaNombre: string;
+  nombre: string;
+  requiereAdjunto: boolean;
+  slaHoras: number;
+  activo: boolean;
+}
+
+export interface PrioridadAdmin {
+  id: number;
+  nombre: string;
+  orden: number;
+}
+
+export interface EstadoAdmin {
+  id: number;
+  nombre: string;
+  ambito: string;
+  orden: number;
+  esFinal: boolean;
+}
+
+export interface TransicionAdmin {
+  id: number;
+  estadoOrigenId: number;
+  estadoOrigenNombre: string;
+  estadoDestinoId: number;
+  estadoDestinoNombre: string;
+  rolId: number | null;
+  rolNombre: string | null;
+  ambito: string;
+  requiereMotivo: boolean;
+}
+
+export interface AmbienteAdmin {
+  id: number;
+  nombre: string;
+  tipo: 'AUDITORIO' | 'LABORATORIO' | 'SALON';
+  pabellon: 'ANTIGUO' | 'NUEVO' | 'CENTRAL';
+  piso: number | null;
+  capacidad: number;
+  activo: boolean;
+}
+

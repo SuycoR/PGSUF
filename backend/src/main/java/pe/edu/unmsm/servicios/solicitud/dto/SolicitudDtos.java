@@ -2,10 +2,13 @@ package pe.edu.unmsm.servicios.solicitud.dto;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import pe.edu.unmsm.servicios.catalogo.entity.EstadoTransicion;
 import pe.edu.unmsm.servicios.solicitud.entity.Evidencia;
 import pe.edu.unmsm.servicios.solicitud.entity.HistorialEstado;
 import pe.edu.unmsm.servicios.solicitud.entity.Solicitud;
@@ -53,18 +56,41 @@ public final class SolicitudDtos {
     }
 
     public record SolicitudDetalle(Long id, String codigo, String categoria, String tipo, String area,
-            boolean requiereAdjunto, String prioridad, String estado, boolean estadoFinal, String descripcion,
-            String ubicacion, String respuesta, PersonaResumen solicitante, PersonaResumen responsable,
-            LocalDateTime fechaRegistro, LocalDateTime fechaLimite, LocalDateTime fechaCierre, boolean vencida) {
+            Integer areaId, boolean requiereAdjunto, String prioridad, Integer prioridadId, String estado,
+            boolean estadoFinal, String descripcion, String ubicacion, String respuesta, PersonaResumen solicitante,
+            PersonaResumen responsable, LocalDateTime fechaRegistro, LocalDateTime fechaLimite,
+            LocalDateTime fechaCierre, boolean vencida) {
 
         public static SolicitudDetalle de(Solicitud s, LocalDateTime ahora) {
             var tipo = s.getTipoSolicitud();
             return new SolicitudDetalle(s.getId(), s.getCodigo(), tipo.getCategoria().getNombre(), tipo.getNombre(),
-                    tipo.getArea().getNombre(), tipo.isRequiereAdjunto(), s.getPrioridad().getNombre(),
-                    s.getEstado().getNombre(), s.getEstado().isEsFinal(), s.getDescripcion(), s.getUbicacion(),
-                    s.getRespuesta(), PersonaResumen.de(s.getUsuario()), PersonaResumen.de(s.getResponsable()),
+                    tipo.getArea().getNombre(), tipo.getArea().getId(), tipo.isRequiereAdjunto(),
+                    s.getPrioridad().getNombre(), s.getPrioridad().getId(), s.getEstado().getNombre(),
+                    s.getEstado().isEsFinal(), s.getDescripcion(), s.getUbicacion(), s.getRespuesta(),
+                    PersonaResumen.de(s.getUsuario()), PersonaResumen.de(s.getResponsable()),
                     s.getFechaRegistro(), s.getFechaLimite(), s.getFechaCierre(), s.estaVencida(ahora));
         }
+    }
+
+    public record TransicionResponse(Integer estadoDestinoId, String nombre, boolean esFinal,
+            boolean requiereMotivo) {
+
+        public static TransicionResponse de(EstadoTransicion t) {
+            var destino = t.getEstadoDestino();
+            return new TransicionResponse(destino.getId(), destino.getNombre(), destino.isEsFinal(),
+                    t.isRequiereMotivo());
+        }
+    }
+
+    public record AsignarTecnicoRequest(@NotNull(message = "es obligatorio") Long responsableId) {
+    }
+
+    public record CambiarEstadoRequest(
+            @NotNull(message = "es obligatorio") @JsonAlias("estadoDestinoId") Integer estadoId,
+            @JsonAlias({"motivo", "respuesta"}) @Size(max = 2000, message = "admite hasta 2000 caracteres") String comentario) {
+    }
+
+    public record CambiarPrioridadRequest(@NotNull(message = "es obligatoria") Integer prioridadId) {
     }
 
     /** {@code usuario} is "Sistema" when the change was automatic. */

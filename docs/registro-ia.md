@@ -87,3 +87,69 @@ Copiar este bloque para cada registro nuevo:
 | Validación realizada | 37 pruebas de backend y 18 de frontend; pruebas manuales de la API (casos válidos, errores 400/401/403/409/422, tokens alterados y falsificados) y del flujo completo en el navegador. |
 | Modificaciones | [Completar] |
 | Responsable | Suyco Rivera Pedro Jesus |
+
+### IA-06 — Sprint S3: gestión y asignación de solicitudes (HU-07, HU-08, HU-09)
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-13 |
+| Herramienta | T3 Code: Claude (Claude Code) como orquestador y revisor; subagente Gemini 4 Hydrogen (Antigravity) como implementador |
+| Prompt | Implementar en `feature/s3-gestion-solicitudes` la bandeja paginada con filtros (`estadoId`, `categoriaId`, `prioridadId`, `vencidas`), las solicitudes asignadas al técnico, las transiciones permitidas por `estado_transicion` y rol (RN-05), la asignación de técnico (RN-07), el cambio de estado con historial y validación de propiedad/área (RN-06), el cambio de prioridad y la subida/descarga de evidencias; en el frontend, `BandejaPage`, `AsignadasPage` y los controles del detalle; con pruebas unitarias y MockMvc de 401/403 y transiciones válidas/inválidas. |
+| Resultado generado | Entidad `EstadoTransicion`, `TransicionService`, eventos `SolicitudAsignadaEvent`/`EstadoCambiadoEvent`, nuevos endpoints en `SolicitudController` y `UsuarioController`, pantallas de bandeja y asignadas, detalle con transiciones, asignación, prioridad y evidencias, y pruebas de backend y frontend (PR #2). |
+| ¿Se utilizó? | Sí, con correcciones. |
+| Validación realizada | Suite completa de backend contra MySQL 9 en Docker (90 pruebas); lint, build y 32 pruebas de frontend. La revisión detectó que la prueba de solicitudes vencidas dependía de la zona horaria del servidor de base de datos (`NOW()` en UTC frente al `Clock` de la aplicación en America/Lima) y del caché de primer nivel de Hibernate tras un `UPDATE` por JDBC. |
+| Modificaciones | La prueba `bandejaFiltersAndAreaRestrictionWork` ahora calcula la fecha límite con el `Clock` de la aplicación y limpia el `EntityManager` después del `UPDATE` (commit `6b2f056`). |
+| Responsable | [Completar: Persona 1] |
+
+### IA-07 — Fase III: endurecimiento de seguridad OWASP
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-13 |
+| Herramienta | T3 Code: Claude (Claude Code) como orquestador y revisor; subagente Gemini 4 Hydrogen (Antigravity) como implementador |
+| Prompt | Endurecer `SecurityConfig` en `feature/seguridad-owasp`: cabeceras `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy` y CSP básica compatible con Swagger; CORS leído de `CORS_ALLOWED_ORIGINS` y validado al arrancar; ningún stacktrace en `ProblemDetail`; límite de intentos fallidos en `/api/auth/login` con 429 y `Retry-After`; pruebas de cabeceras, CORS, 401/403, 500 genérico y limitador. |
+| Resultado generado | Cabeceras y CSP, `CorsOriginsValidator` (rechaza `*` con credenciales y en `prod`), manejador genérico de 500, `server.error.include-*` en `never`, `LoginRateLimiter` en memoria por IP + correo con `Clock` inyectable y propiedades configurables, documentación en `docs/08-configuracion.md` y pruebas (PR #1). |
+| ¿Se utilizó? | Sí. |
+| Validación realizada | Revisión del diff (la IP se toma de `remoteAddr`, no de `X-Forwarded-For`, para que no se pueda falsificar); suite completa de backend contra MySQL 9 (87 pruebas) y suite combinada con S3 (109 pruebas), sin conflictos de merge. |
+| Modificaciones | Ninguna. Limitación conocida: el limitador es por IP + correo, así que no frena un ataque que rote correos; es suficiente como protección básica. |
+| Responsable | [Completar: Persona 1] |
+
+### IA-08 — Sprint S6: comentarios y notificaciones (HU-10, HU-17, RN-16)
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-13 |
+| Herramienta | T3 Code: Claude (Claude Code) como orquestador y revisor; subagente Gemini 4 Hydrogen (Antigravity) como implementador |
+| Prompt | Implementar en `feature/comentarios-notificaciones`, sobre S3 y la rama de seguridad, los comentarios por solicitud con la misma visibilidad que el detalle, las notificaciones del usuario (listar, contar no leídas, marcar una o todas) y su creación con `@TransactionalEventListener(AFTER_COMMIT)` al asignar, cambiar estado o comentar, sin que un fallo de notificación afecte la operación principal; en el frontend, caja de comentarios, `NotificacionesPage` y campana con contador. |
+| Resultado generado | Paquetes `comentario` y `notificacion`, `NotificacionListener` con `REQUIRES_NEW` y captura de errores, cálculo de destinatarios (nunca el autor), pantallas y campana con sondeo cada 30 s, y pruebas (PR #3). |
+| ¿Se utilizó? | Sí. |
+| Validación realizada | Suite completa de backend contra MySQL 9 (124 pruebas); lint, build y 36 pruebas de frontend. Se revisó el listener: las notificaciones solo se crean si la transacción confirma. |
+| Modificaciones | Ninguna. Decisión: un usuario sin relación con la solicitud recibe 404 en comentarios (como en detalle, evidencias e historial) para no revelar que existe. |
+| Responsable | [Completar: Persona 1] |
+
+### IA-09 — Persona 2: Reservas de Ambientes (S5), Dashboard de Indicadores (S7) y Documentación Swagger/OpenAPI
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-14 |
+| Herramienta | Antigravity (Gemini 3.8 Flash) |
+| Prompt | Implementar todo el bloque de Persona 2 en `feature/reservas-dashboard`: módulo de Reservas y Ambientes (HU-13, HU-14) con control de concurrencia pesimista (`SELECT FOR UPDATE`), validaciones de horario y cruce (RN-04, RN-17, RN-13), eventos post-commit de notificación (`RESERVA_REGISTRADA`, `RESERVA_RESUELTA`, RN-16); módulo de Dashboard (HU-11, RN-03) con agregaciones por período, KPIs y desgloses; vistas React en `/reservas` (`MisReservasPage`), `/reservas/aprobacion` (`AprobacionReservasPage`) y `/dashboard` (`DashboardPage`); suite de pruebas unitarias y WebMvc de backend y frontend; y auditoría completa de Swagger/OpenAPI al 100% de la API según `docs/07-api.md`. |
+| Resultado generado | Paquetes `ambiente`, `reserva` y `dashboard` en backend; entidades `Ambiente` y `Reserva`; repositorios con queries pesimistas y detección de cruces; servicios y controladores REST; integración de notificaciones en `NotificacionService` y `NotificacionListener`; páginas y CSS en frontend; 22 pruebas de backend (unitarias y MockMvc con `@WebMvcTest`) y 43 pruebas de frontend (`vitest`); y documentación interactiva OpenAPI en todos los endpoints. |
+| ¿Se utilizó? | Sí, verificado y validado al 100%. |
+| Validación realizada | Ejecución exitosa de pruebas unitarias y web de backend (`BUILD SUCCESS`, 22 tests); verificación de tipos TypeScript y empaquetado Vite (`npm run build` sin errores); ejecución de vitest (8 archivos de prueba pasados, 43 tests exitosos). |
+| Modificaciones | Se ajustó el título del `DashboardPage` a `Dashboard` para compatibilidad exacta con los tests de navegación previa y se configuró strictness lenient en mocks de servicios. |
+| Responsable | Persona 2 |
+
+### IA-10 — Persona 3: Módulo de Administración (S7), Docker, CI/CD (GitHub Actions) y Despliegue Cloud
+
+| Campo | Registro |
+|---|---|
+| Fecha | 2026-11-14 |
+| Herramienta | Antigravity (DeepMind) |
+| Prompt | Implementar el alcance completo de la Persona 3 en la rama `feature/admin-devops`: completar los CRUDs administrativos bajo `/api/admin/...` para Usuarios, Áreas, Categorías, Tipos de Solicitud, Prioridades, Estados, Transiciones y Ambientes con control de acceso `hasRole('ADMIN')` y soft-delete (`PUT /{id}/activo`); desarrollar la interfaz de administración en React (`AdminPage.tsx`) con pestañas interactivas, tablas, filtros y modales de creación/edición; configurar contenedores Docker multi-stage para backend (Maven + JRE 21) y frontend (Vite + Nginx reverse proxy); armar `docker-compose.yml` en la raíz con red interna, volúmenes de MySQL y uploads; estructurar el pipeline de GitHub Actions (`.github/workflows/ci.yml`) con jobs para backend, frontend y Docker; y documentar la guía de despliegue en la nube (`docs/10-despliegue-cloud.md`). |
+| Resultado generado | Controladores REST bajo `pe.edu.unmsm.servicios.admin.controller` para las 8 entidades; servicio unificado `AdminCatalogoService` con validaciones de unicidad y reglas de negocio; ampliación de `UsuarioService` y `AdminUsuarioController`; cliente API y tipos en TypeScript; vista integral con pestañas y modales en `AdminPage.tsx` reemplazando `<EnConstruccion />` en `/admin`; `backend/Dockerfile`, `frontend/app/Dockerfile`, `nginx.conf`, `docker-compose.yml`, `.env.example`, `.github/workflows/ci.yml` y `docs/10-despliegue-cloud.md`. |
+| ¿Se utilizó? | Sí, validado e integrado en su totalidad. |
+| Validación realizada | Compilación y ejecución de tests backend (`AdminCatalogoServiceTest`, `AdminAreaControllerWebTest`, `AdminUsuarioControllerWebTest` - 13/13 pasados); verificación frontend de linting (`oxlint` 0 errores), build de TypeScript (`tsc -b && vite build` exitoso) y ejecución de vitest (9 archivos de prueba, 47/47 tests pasados). |
+| Modificaciones | Se independizó la limpieza de alertas en `AdminPage` para no borrar el mensaje de éxito al recargar datos tras activar/desactivar un registro; se eliminó el import huérfano de `EnConstruccion` en `AppRoutes.tsx`. |
+| Responsable | Persona 3 |
+

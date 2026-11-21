@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import pe.edu.unmsm.servicios.catalogo.repository.CategoriaRepository;
@@ -51,6 +54,10 @@ public class CatalogoController {
 
     @GetMapping("/categorias")
     @Operation(summary = "Categorías activas")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de categorías activas obtenida con éxito"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
     public List<CategoriaResponse> categorias() {
         return categorias.findByActivoTrueOrderByNombre().stream()
                 .map(c -> new CategoriaResponse(c.getId(), c.getNombre(), c.esTramite()))
@@ -60,7 +67,13 @@ public class CatalogoController {
     @GetMapping("/tipos-solicitud")
     @Transactional(readOnly = true)
     @Operation(summary = "Tipos activos de una categoría")
-    public List<TipoSolicitudResponse> tipos(@RequestParam Integer categoriaId) {
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de tipos obtenida con éxito"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public List<TipoSolicitudResponse> tipos(
+            @Parameter(description = "ID de la categoría", required = true)
+            @RequestParam Integer categoriaId) {
         return tipos.findByCategoriaIdAndActivoTrueOrderByNombre(categoriaId).stream()
                 .map(t -> new TipoSolicitudResponse(t.getId(), t.getNombre(), t.getCategoria().getId(),
                         t.getArea().getNombre(), t.isRequiereAdjunto(), t.getSlaHoras()))
@@ -68,7 +81,11 @@ public class CatalogoController {
     }
 
     @GetMapping("/prioridades")
-    @Operation(summary = "Prioridades")
+    @Operation(summary = "Lista de prioridades ordenadas")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de prioridades"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
     public List<PrioridadResponse> prioridades() {
         return prioridades.findAllByOrderByOrden().stream()
                 .map(p -> new PrioridadResponse(p.getId(), p.getNombre(), p.getOrden()))
@@ -76,8 +93,14 @@ public class CatalogoController {
     }
 
     @GetMapping("/estados")
-    @Operation(summary = "Estados; ámbito SOLICITUD incluye también los de ámbito AMBOS (RN-11)")
-    public List<EstadoResponse> estados(@RequestParam(defaultValue = "SOLICITUD") String ambito) {
+    @Operation(summary = "Estados disponibles; ámbito SOLICITUD incluye también los de ámbito AMBOS (RN-11)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de estados"),
+            @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public List<EstadoResponse> estados(
+            @Parameter(description = "Ámbito de los estados: SOLICITUD o RESERVA")
+            @RequestParam(defaultValue = "SOLICITUD") String ambito) {
         return estados.findByAmbitoInOrderByOrden(Set.of(ambito, "AMBOS")).stream()
                 .map(e -> new EstadoResponse(e.getId(), e.getNombre(), e.getAmbito(), e.getOrden(), e.isEsFinal()))
                 .toList();

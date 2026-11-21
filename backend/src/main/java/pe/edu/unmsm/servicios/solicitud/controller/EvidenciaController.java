@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import pe.edu.unmsm.servicios.auth.jwt.UsuarioAutenticado;
@@ -33,7 +35,12 @@ public class EvidenciaController {
 
     /** Always served as an attachment; Spring Security adds "X-Content-Type-Options: nosniff". */
     @GetMapping("/{id}/descarga")
-    @Operation(summary = "Descarga un archivo de evidencia")
+    @Operation(summary = "Descarga un archivo de evidencia (HU-06)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Archivo descargado como adjunto"),
+            @ApiResponse(responseCode = "401", description = "No autenticado"),
+            @ApiResponse(responseCode = "404", description = "Evidencia no encontrada o no visible para el usuario")
+    })
     public ResponseEntity<Resource> descargar(@AuthenticationPrincipal UsuarioAutenticado usuario,
             @PathVariable Long id) {
         Descarga descarga = service.descargar(usuario.id(), id);

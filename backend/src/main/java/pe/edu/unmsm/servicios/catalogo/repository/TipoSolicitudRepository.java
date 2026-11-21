@@ -11,4 +11,11 @@ public interface TipoSolicitudRepository extends JpaRepository<TipoSolicitud, In
 
     @EntityGraph(attributePaths = {"categoria", "area"})
     List<TipoSolicitud> findByCategoriaIdAndActivoTrueOrderByNombre(Integer categoriaId);
+
+    @EntityGraph(attributePaths = {"categoria", "area"})
+    List<TipoSolicitud> findAllByOrderByCategoriaNombreAscNombreAsc();
+
+    boolean existsByCategoriaIdAndNombre(Integer categoriaId, String nombre);
+
+    boolean existsByCategoriaIdAndNombreAndIdNot(Integer categoriaId, String nombre, Integer id);
 }
